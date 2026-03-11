@@ -88,11 +88,10 @@ const CreateHackathon = () => {
           {STEPS.map((s, i) => (
             <div key={s} className="flex items-center gap-2 flex-1">
               <div
-                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors ${
-                  i <= step
-                    ? "bg-gradient-to-br from-primary to-secondary text-primary-foreground"
+                className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-bold transition-colors ${i <= step
+                    ? "bg-primary text-primary-foreground"
                     : "bg-muted text-muted-foreground"
-                }`}
+                  }`}
               >
                 {i < step ? <Check className="h-4 w-4" /> : i + 1}
               </div>
@@ -126,7 +125,7 @@ const CreateHackathon = () => {
                             key={t}
                             type="button"
                             variant={form.type === t ? "default" : "outline"}
-                            className={form.type === t ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground" : ""}
+                            className={form.type === t ? "bg-primary text-primary-foreground" : ""}
                             onClick={() => set("type", t)}
                           >
                             {t === "online" ? "🌐 Online" : "🏢 Offline"}
@@ -181,11 +180,10 @@ const CreateHackathon = () => {
                           <Badge
                             key={t}
                             variant={form.themes.includes(t) ? "default" : "outline"}
-                            className={`cursor-pointer transition-all ${
-                              form.themes.includes(t)
-                                ? "bg-gradient-to-r from-primary to-secondary text-primary-foreground"
+                            className={`cursor-pointer transition-all ${form.themes.includes(t)
+                                ? "bg-primary text-primary-foreground"
                                 : "hover:bg-muted"
-                            }`}
+                              }`}
                             onClick={() => toggleTheme(t)}
                           >
                             {t}
@@ -228,11 +226,11 @@ const CreateHackathon = () => {
             <ArrowLeft className="mr-1 h-4 w-4" /> Previous
           </Button>
           {step < STEPS.length - 1 ? (
-            <Button disabled={!canNext()} onClick={() => setStep((s) => s + 1)} className="bg-gradient-to-r from-primary to-secondary text-primary-foreground gap-1">
+            <Button disabled={!canNext()} onClick={() => setStep((s) => s + 1)} className="bg-primary text-primary-foreground gap-1">
               Next <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handlePublish} className="bg-gradient-to-r from-accent to-primary text-primary-foreground gap-1">
+            <Button onClick={handlePublish} className="bg-primary text-primary-foreground gap-1">
               <Zap className="h-4 w-4" /> Publish Hackathon
             </Button>
           )}

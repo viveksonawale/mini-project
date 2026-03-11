@@ -64,7 +64,7 @@ const StatCard = ({ stat, index }: { stat: StatItem; index: number }) => {
       className="group relative rounded-2xl border border-border/50 bg-card/50 backdrop-blur-sm p-6 text-center transition-all duration-500 hover:border-primary/50 hover:shadow-[0_0_30px_rgba(217,240,41,0.08)] hover:-translate-y-1 cursor-default overflow-hidden"
     >
       {/* Hover glow background */}
-      <div className="absolute inset-0 rounded-2xl bg-gradient-to-b from-primary/0 to-primary/0 transition-all duration-500 group-hover:from-primary/5 group-hover:to-transparent" />
+      <div className="absolute inset-0 rounded-2xl transition-all duration-500 group-hover:bg-primary/5" />
 
       <div className="relative z-10">
         <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/10 transition-all duration-500 group-hover:bg-primary/20 group-hover:scale-110">
@@ -251,7 +251,7 @@ const Index = () => {
                 <Card className="group overflow-hidden border-border/50 transition-all hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5">
                   {/* Banner */}
                   <div
-                    className={`h-32 bg-gradient-to-br ${h.bannerGradient} p-4`}
+                    className={`h-32 bg-primary p-4`}
                   >
                     <Badge
                       className={
@@ -341,7 +341,7 @@ const Index = () => {
                 transition={{ delay: i * 0.15 }}
               >
                 <Card className="border-border/50 p-6 text-center transition-all hover:border-primary/30">
-                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/20 to-secondary/20">
+                  <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-primary/20">
                     <item.icon className="h-6 w-6 text-primary" />
                   </div>
                   <h3 className="font-heading text-lg font-semibold">

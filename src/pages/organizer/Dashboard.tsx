@@ -51,7 +51,7 @@ const OrganiserDashboard = () => {
             <p className="text-muted-foreground">Manage your hackathons and track performance</p>
           </div>
           <Link to="/organiser/create-hackathon">
-            <Button className="bg-gradient-to-r from-primary to-secondary text-primary-foreground gap-2">
+            <Button className="bg-primary text-primary-foreground gap-2">
               <Plus className="h-4 w-4" /> Create Hackathon
             </Button>
           </Link>

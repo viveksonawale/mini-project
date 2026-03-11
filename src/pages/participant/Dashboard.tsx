@@ -101,7 +101,7 @@ const ParticipantDashboard = () => {
               <Card key={t.id}>
                 <CardContent className="p-4 space-y-3">
                   <div className="flex items-center gap-3">
-                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-sm font-bold text-primary-foreground">
+                    <div className="h-9 w-9 rounded-full bg-primary flex items-center justify-center text-sm font-bold text-primary-foreground">
                       {t.avatar}
                     </div>
                     <div>

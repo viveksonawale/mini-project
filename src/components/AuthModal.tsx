@@ -88,204 +88,205 @@ const AuthModal = ({ open, onOpenChange, defaultView = "login" }: AuthModalProps
 
     return (
         <Dialog open={open} onOpenChange={handleOpenChange}>
-            {/* Header with Logo moved outside the main card padding */}
-            <div className="bg-background pt-6 pb-4 flex flex-col items-center justify-center">
-                <div className="flex flex-row items-center justify-center gap-2">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
-                        <Zap className="h-6 w-6 text-black" fill="currentColor" />
+            <DialogContent className="sm:max-w-md border-border bg-card p-0 overflow-hidden rounded-2xl">
+                {/* Header with Logo moved outside the main card padding */}
+                <div className="bg-background pt-6 pb-4 flex flex-col items-center justify-center">
+                    <div className="flex flex-row items-center justify-center gap-2">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
+                            <Zap className="h-6 w-6 text-black" fill="currentColor" />
+                        </div>
+                        <span className="font-heading text-xl font-bold text-foreground tracking-wide">
+                            EVNOVA
+                        </span>
                     </div>
-                    <span className="font-heading text-xl font-bold text-foreground tracking-wide">
-                        EVNOVA
-                    </span>
                 </div>
-            </div>
 
-            <div className="px-6 pb-8 pt-4 border-t border-border/50 bg-card">
-                <DialogHeader className="text-center mb-6">
-                    <DialogTitle className="font-heading text-2xl font-semibold">
-                        {view === "login" ? "Welcome back" : "Create your account"}
-                    </DialogTitle>
-                    <DialogDescription className="text-muted-foreground">
-                        {view === "login" ? "Log in to your EVNOVA account" : "Join the EVNOVA community"}
-                    </DialogDescription>
-                </DialogHeader>
+                <div className="px-6 pb-8 pt-4 border-t border-border/50 bg-card">
+                    <DialogHeader className="text-center mb-6">
+                        <DialogTitle className={`font-heading font-semibold ${view === "login" ? "text-xl" : "text-2xl"}`}>
+                            {view === "login" ? "Welcome back" : "Create your account"}
+                        </DialogTitle>
+                        <DialogDescription className="text-muted-foreground">
+                            {view === "login" ? "Sign in to continue to EVNOVA" : "Join the EVNOVA community"}
+                        </DialogDescription>
+                    </DialogHeader>
 
-                {view === "login" ? (
-                    /* ─── Login Form ─── */
-                    <form onSubmit={handleLogin} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="modal-email">Email</Label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="modal-email"
-                                    type="email"
-                                    placeholder="you@example.com"
-                                    className="pl-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="modal-password">Password</Label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="modal-password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="••••••••"
-                                    className="pl-10 pr-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                </button>
-                            </div>
-                        </div>
-
-                        <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-black font-semibold hover:-translate-y-0 border-0 shadow-none">
-                            Log in
-                        </Button>
-                    </form>
-                ) : (
-                    /* ─── Signup Form ─── */
-                    <form onSubmit={handleSignup} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="modal-name">Full Name</Label>
-                            <div className="relative">
-                                <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="modal-name"
-                                    placeholder="John Doe"
-                                    className="pl-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
-                                    value={name}
-                                    onChange={(e) => setName(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="modal-signup-email">Email</Label>
-                            <div className="relative">
-                                <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="modal-signup-email"
-                                    type="email"
-                                    placeholder="you@example.com"
-                                    className="pl-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="modal-signup-password">Password</Label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="modal-signup-password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="••••••••"
-                                    className="pl-10 pr-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    required
-                                />
-                                <button
-                                    type="button"
-                                    onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
-                                >
-                                    {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                                </button>
-                            </div>
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label htmlFor="modal-confirm-password">Confirm Password</Label>
-                            <div className="relative">
-                                <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                                <Input
-                                    id="modal-confirm-password"
-                                    type={showPassword ? "text" : "password"}
-                                    placeholder="••••••••"
-                                    className="pl-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
-                                    value={confirmPassword}
-                                    onChange={(e) => setConfirmPassword(e.target.value)}
-                                    required
-                                />
-                            </div>
-                        </div>
-
-                        {/* Role selector */}
-                        <div className="space-y-3 pb-1 pt-1">
-                            <Label>I want to:</Label>
-                            <div className="grid grid-cols-2 gap-3">
-                                <Button
-                                    type="button"
-                                    variant={role === "participant" ? "default" : "outline"}
-                                    className={`hover:-translate-y-0 border-0 shadow-none font-semibold ${role === "participant" ? "bg-primary text-black hover:bg-primary/90" : "bg-black/40 text-muted-foreground hover:bg-black/60"}`}
-                                    onClick={() => setRole("participant")}
-                                >
-                                    Join Hackathons
-                                </Button>
-                                <Button
-                                    type="button"
-                                    variant={role === "organiser" ? "default" : "outline"}
-                                    className={`hover:-translate-y-0 border-0 shadow-none font-semibold ${role === "organiser" ? "bg-primary text-black hover:bg-primary/90" : "bg-black/40 text-muted-foreground hover:bg-black/60"}`}
-                                    onClick={() => setRole("organiser")}
-                                >
-                                    Host Hackathons
-                                </Button>
-                            </div>
-                        </div>
-
-                        <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-black font-semibold hover:-translate-y-0 border-0 shadow-none">
-                            Create Account
-                        </Button>
-                    </form>
-                )}
-
-                {/* Toggle between login / signup */}
-                <p className="mt-6 text-center text-sm text-muted-foreground">
                     {view === "login" ? (
-                        <>
-                            Don't have an account?{" "}
-                            <button
-                                type="button"
-                                onClick={() => switchView("signup")}
-                                className="font-medium text-[#c0e000] hover:underline hover:text-primary transition-colors"
-                            >
-                                Sign up
-                            </button>
-                        </>
-                    ) : (
-                        <>
-                            Already have an account?{" "}
-                            <button
-                                type="button"
-                                onClick={() => switchView("login")}
-                                className="font-medium text-[#c0e000] hover:underline hover:text-primary transition-colors"
-                            >
+                        /* ─── Login Form ─── */
+                        <form onSubmit={handleLogin} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="modal-email">Email</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="modal-email"
+                                        type="email"
+                                        placeholder="you@example.com"
+                                        className="pl-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="modal-password">Password</Label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="modal-password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="••••••••"
+                                        className="pl-10 pr-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-black font-semibold hover:-translate-y-0 border-0 shadow-none">
                                 Log in
-                            </button>
-                        </>
+                            </Button>
+                        </form>
+                    ) : (
+                        /* ─── Signup Form ─── */
+                        <form onSubmit={handleSignup} className="space-y-4">
+                            <div className="space-y-2">
+                                <Label htmlFor="modal-name">Full Name</Label>
+                                <div className="relative">
+                                    <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="modal-name"
+                                        placeholder="John Doe"
+                                        className="pl-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+                                        value={name}
+                                        onChange={(e) => setName(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="modal-signup-email">Email</Label>
+                                <div className="relative">
+                                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="modal-signup-email"
+                                        type="email"
+                                        placeholder="you@example.com"
+                                        className="pl-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+                                        value={email}
+                                        onChange={(e) => setEmail(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="modal-signup-password">Password</Label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="modal-signup-password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="••••••••"
+                                        className="pl-10 pr-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+                                        value={password}
+                                        onChange={(e) => setPassword(e.target.value)}
+                                        required
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowPassword(!showPassword)}
+                                        className="absolute right-3 top-3 text-muted-foreground hover:text-foreground transition-colors"
+                                    >
+                                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label htmlFor="modal-confirm-password">Confirm Password</Label>
+                                <div className="relative">
+                                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                                    <Input
+                                        id="modal-confirm-password"
+                                        type={showPassword ? "text" : "password"}
+                                        placeholder="••••••••"
+                                        className="pl-10 bg-black/40 border-border/50 focus-visible:ring-1 focus-visible:ring-primary focus-visible:border-primary"
+                                        value={confirmPassword}
+                                        onChange={(e) => setConfirmPassword(e.target.value)}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            {/* Role selector */}
+                            <div className="space-y-3 pb-1 pt-1">
+                                <Label>I want to:</Label>
+                                <div className="grid grid-cols-2 gap-3">
+                                    <Button
+                                        type="button"
+                                        variant={role === "participant" ? "default" : "outline"}
+                                        className={`hover:-translate-y-0 border-0 shadow-none font-semibold ${role === "participant" ? "bg-primary text-black hover:bg-primary/90" : "bg-black/40 text-muted-foreground hover:bg-black/60"}`}
+                                        onClick={() => setRole("participant")}
+                                    >
+                                        Join Hackathons
+                                    </Button>
+                                    <Button
+                                        type="button"
+                                        variant={role === "organiser" ? "default" : "outline"}
+                                        className={`hover:-translate-y-0 border-0 shadow-none font-semibold ${role === "organiser" ? "bg-primary text-black hover:bg-primary/90" : "bg-black/40 text-muted-foreground hover:bg-black/60"}`}
+                                        onClick={() => setRole("organiser")}
+                                    >
+                                        Host Hackathons
+                                    </Button>
+                                </div>
+                            </div>
+
+                            <Button type="submit" className="w-full bg-primary hover:bg-primary/90 text-black font-semibold hover:-translate-y-0 border-0 shadow-none">
+                                Create Account
+                            </Button>
+                        </form>
                     )}
-                </p>
-            </div>
-        </DialogContent>
+
+                    {/* Toggle between login / signup */}
+                    <p className="mt-6 text-center text-sm text-muted-foreground">
+                        {view === "login" ? (
+                            <>
+                                Don't have an account?{" "}
+                                <button
+                                    type="button"
+                                    onClick={() => switchView("signup")}
+                                    className="font-medium text-[#c0e000] hover:underline hover:text-primary transition-colors"
+                                >
+                                    Sign up
+                                </button>
+                            </>
+                        ) : (
+                            <>
+                                Already have an account?{" "}
+                                <button
+                                    type="button"
+                                    onClick={() => switchView("login")}
+                                    className="font-medium text-[#c0e000] hover:underline hover:text-primary transition-colors"
+                                >
+                                    Log in
+                                </button>
+                            </>
+                        )}
+                    </p>
+                </div>
+            </DialogContent>
         </Dialog >
     );
 };

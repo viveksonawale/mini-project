@@ -42,7 +42,7 @@ const HackathonDetail = () => {
 
         {/* Banner */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className={`rounded-2xl bg-gradient-to-br ${h.bannerGradient} p-8 md:p-12 mb-8`}>
+          className={`rounded-2xl bg-primary p-8 md:p-12 mb-8`}>
           <div className="flex flex-wrap gap-2 mb-4">
             <Badge className="bg-background/20 text-primary-foreground backdrop-blur-sm">{h.status}</Badge>
             <Badge className="bg-background/20 text-primary-foreground backdrop-blur-sm">{h.type === "online" ? "🌐 Online" : "📍 Offline"}</Badge>
@@ -97,7 +97,7 @@ const HackathonDetail = () => {
                   </div>
                 </div>
                 {(h.status === "open" || h.status === "upcoming") && (
-                  <Button onClick={handleRegister} className="w-full bg-gradient-to-r from-primary to-secondary text-primary-foreground gap-2">
+                  <Button onClick={handleRegister} className="w-full bg-primary text-primary-foreground gap-2">
                     <UserPlus className="h-4 w-4" /> Register Now
                   </Button>
                 )}

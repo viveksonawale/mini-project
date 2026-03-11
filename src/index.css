@@ -111,9 +111,6 @@
   h5,
   h6 {
     font-family: 'Space Grotesk', sans-serif;
-    background: linear-gradient(180deg, #ffffff 0%, #999999 50%, #666666 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: hsl(var(--foreground));
   }
 }

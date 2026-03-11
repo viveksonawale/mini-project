@@ -80,7 +80,7 @@ const ManageSubmissions = () => {
               <p className="text-muted-foreground">{hackathon.title}</p>
             </div>
             <Link to={`/organiser/hackathon/${hackathonId}/leaderboard`}>
-              <Button className="gap-2 bg-gradient-to-r from-primary to-secondary text-primary-foreground">
+              <Button className="gap-2 bg-primary text-primary-foreground">
                 <Star className="h-4 w-4" /> Leaderboard
               </Button>
             </Link>

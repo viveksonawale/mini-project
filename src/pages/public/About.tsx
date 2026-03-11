@@ -50,7 +50,7 @@ const About = () => {
       <main className="pt-16">
         {/* Hero */}
         <section className="relative overflow-hidden py-24 lg:py-32">
-          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+
           <div className="container mx-auto px-4 relative">
             <motion.div initial="hidden" animate="visible" className="max-w-3xl mx-auto text-center">
               <motion.div variants={fadeUp} custom={0} className="inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-sm text-primary mb-6">

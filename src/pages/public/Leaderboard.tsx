@@ -10,9 +10,9 @@ import { Progress } from "@/components/ui/progress";
 import { submissions, orgHackathons, type Submission } from "@/data/organiserMockData";
 
 const rankStyle = [
-  "bg-gradient-to-r from-[hsl(45,93%,47%)] to-[hsl(36,100%,50%)] text-background",
-  "bg-gradient-to-r from-[hsl(210,10%,70%)] to-[hsl(210,10%,55%)] text-background",
-  "bg-gradient-to-r from-[hsl(30,60%,50%)] to-[hsl(20,50%,40%)] text-background",
+  "bg-[hsl(45,93%,47%)] text-background",
+  "bg-[hsl(210,10%,70%)] text-background",
+  "bg-[hsl(30,60%,50%)] text-background",
 ];
 
 const Leaderboard = () => {
