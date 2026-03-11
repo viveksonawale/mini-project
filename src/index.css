@@ -1,0 +1,119 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 120 10% 4%;
+    --foreground: 0 0% 100%;
+
+    --card: 120 10% 6%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 120 10% 6%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 67 88% 55%;
+    --primary-foreground: 120 10% 4%;
+
+    --secondary: 120 10% 10%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 120 10% 12%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 67 88% 55%;
+    --accent-foreground: 120 10% 4%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 120 10% 12%;
+    --input: 120 10% 12%;
+    --ring: 67 88% 55%;
+
+    --radius: 0.75rem;
+
+    --evnova-orange: 67 88% 55%;
+    --evnova-purple-glow: 120 50% 20%;
+    --evnova-blue-glow: 67 88% 30%;
+
+    --sidebar-background: 120 10% 4%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 67 88% 55%;
+    --sidebar-primary-foreground: 120 10% 4%;
+    --sidebar-accent: 120 10% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 120 10% 12%;
+    --sidebar-ring: 67 88% 55%;
+  }
+
+  .dark {
+    --background: 120 10% 4%;
+    --foreground: 0 0% 100%;
+
+    --card: 120 10% 6%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 120 10% 6%;
+    --popover-foreground: 0 0% 100%;
+
+    --primary: 67 88% 55%;
+    --primary-foreground: 120 10% 4%;
+
+    --secondary: 120 10% 10%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 120 10% 12%;
+    --muted-foreground: 0 0% 60%;
+
+    --accent: 67 88% 55%;
+    --accent-foreground: 120 10% 4%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 120 10% 12%;
+    --input: 120 10% 12%;
+    --ring: 67 88% 55%;
+
+    --evnova-orange: 67 88% 55%;
+    --evnova-purple-glow: 120 50% 20%;
+    --evnova-blue-glow: 67 88% 30%;
+
+    --sidebar-background: 120 10% 4%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 67 88% 55%;
+    --sidebar-primary-foreground: 120 10% 4%;
+    --sidebar-accent: 120 10% 10%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 120 10% 15%;
+    --sidebar-ring: 67 88% 55%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Space Grotesk', sans-serif;
+    background: linear-gradient(180deg, #ffffff 0%, #999999 50%, #666666 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+}

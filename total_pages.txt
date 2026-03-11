@@ -1,0 +1,19 @@
+Total number of pages: 16
+
+List of pages:
+1. About.tsx
+2. BrowseHackathons.tsx
+3. Community.tsx
+4. CreateHackathon.tsx
+5. ForgotPassword.tsx
+6. HackathonDetail.tsx
+7. Index.tsx
+8. Leaderboard.tsx
+9. Login.tsx
+10. ManageSubmissions.tsx
+11. NotFound.tsx
+12. OrganiserDashboard.tsx
+13. ParticipantDashboard.tsx
+14. RegisterHackathon.tsx
+15. SelectRole.tsx
+16. Signup.tsx
