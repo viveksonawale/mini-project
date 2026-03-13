@@ -1,32 +1,39 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, Zap, LogOut } from "lucide-react";
+import { Menu, X, Zap, LogOut, Shield, User as UserIcon } from "lucide-react";
 import NotificationDropdown from "@/components/NotificationDropdown";
 import { useAuth } from "@/contexts/AuthContext";
 import { Button } from "@/components/ui/button";
-import AuthModal from "@/components/AuthModal";
 import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 
 const Navbar = () => {
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, logout, quickLogin } = useAuth();
   const navigate = useNavigate();
+  const { toast } = useToast();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [authView, setAuthView] = useState<"login" | "signup">("login");
 
   const handleLogout = () => {
     logout();
     navigate("/");
   };
 
+  const handleQuickLogin = (role: "organiser" | "participant") => {
+    quickLogin(role);
+    toast({ 
+      title: `Demo Mode: ${role === 'organiser' ? 'Host' : 'Participant'}`, 
+      description: "Logged in automatically for demo purpose." 
+    });
+    setMobileOpen(false);
+    navigate(role === 'organiser' ? '/organizer/dashboard' : '/participant/dashboard');
+  };
+
   const openLogin = () => {
-    setAuthView("login");
-    setAuthOpen(true);
+    navigate("/login");
     setMobileOpen(false);
   };
 
   const openSignup = () => {
-    setAuthView("signup");
-    setAuthOpen(true);
+    navigate("/signup");
     setMobileOpen(false);
   };
 
@@ -40,60 +47,95 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background">
+      <nav className="fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/80 backdrop-blur-md">
         <div className="container mx-auto flex h-20 items-center justify-between px-4 relative">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold z-10">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+          <Link to="/" className="flex items-center gap-2 font-heading text-xl font-bold z-10 transition-transform hover:scale-105">
+            <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-primary shadow-[0_0_15px_rgba(216,245,36,0.3)]">
               <Zap className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="text-foreground">
+            <span className="text-foreground tracking-tight">
               evnova
             </span>
           </Link>
 
           {/* Desktop links - absolutely centered */}
-          <div className="hidden md:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="hidden lg:flex items-center gap-8 absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
             {navLinks.map((l) => (
               <Link
                 key={l.to}
                 to={l.to}
-                className="font-medium text-muted-foreground transition-colors hover:text-foreground" style={{ fontSize: '17px' }}
+                className="font-medium text-muted-foreground transition-all hover:text-primary relative group" style={{ fontSize: '16px' }}
               >
                 {l.label}
+                <span className="absolute -bottom-1 left-0 w-0 h-0.5 bg-primary transition-all group-hover:w-full"></span>
               </Link>
             ))}
           </div>
 
           {/* Actions */}
           <div className="hidden items-center gap-3 md:flex">
+            {!isAuthenticated && (
+              <div className="flex items-center gap-1.5 mr-2 pr-2 border-r border-border/50">
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleQuickLogin("participant")}
+                  className="h-8 text-[11px] uppercase tracking-wider font-bold hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20"
+                >
+                  User Demo
+                </Button>
+                <Button 
+                  variant="ghost" 
+                  size="sm" 
+                  onClick={() => handleQuickLogin("organiser")}
+                  className="h-8 text-[11px] uppercase tracking-wider font-bold hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20"
+                >
+                  Host Demo
+                </Button>
+              </div>
+            )}
+
             {isAuthenticated && <NotificationDropdown />}
             {isAuthenticated ? (
-              <>
-                <div className="flex items-center gap-2 rounded-full border border-border/50 bg-muted/50 px-3 py-1.5">
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 rounded-full border border-border/50 bg-muted/30 pl-1.5 pr-3 py-1 transition-all hover:bg-muted/50">
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground shadow-sm">
                     {user?.name?.charAt(0) || "U"}
                   </div>
-                  <span className="text-sm font-medium">{user?.name?.split(" ")[0]}</span>
-                  {user?.role && (
-                    <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary capitalize">{user.role}</span>
-                  )}
+                  <div className="flex flex-col">
+                    <span className="text-[13px] font-bold leading-none">{user?.name?.split(" ")[0]}</span>
+                    {user?.role && (
+                      <span className="text-[10px] text-primary font-medium capitalize mt-0.5">{user.role}</span>
+                    )}
+                  </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={handleLogout} aria-label="Log out">
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  onClick={handleLogout} 
+                  className="h-9 w-9 rounded-full hover:bg-destructive/10 hover:text-destructive transition-colors"
+                  aria-label="Log out"
+                >
                   <LogOut className="h-4 w-4" />
                 </Button>
-              </>
+              </div>
             ) : (
               <>
                 <Button
+                  variant="ghost"
                   size="sm"
-                  className="bg-transparent text-muted-foreground shadow-none hover:bg-primary hover:text-primary-foreground hover:shadow-none hover:-translate-y-0"
+                  className="font-semibold text-muted-foreground hover:text-foreground"
                   onClick={openLogin}
                 >
                   Log in
                 </Button>
-                <Button size="sm" className="hover:translate-y-0" onClick={openSignup}>
-                  Sign Up
+                <Button 
+                  size="sm" 
+                  className="font-bold shadow-[0_0_10px_rgba(216,245,36,0.2)] hover:shadow-[0_0_20px_rgba(216,245,36,0.4)] px-5" 
+                  onClick={openSignup}
+                >
+                  Get Started
                 </Button>
               </>
             )}
@@ -102,62 +144,89 @@ const Navbar = () => {
           {/* Mobile toggle */}
           <div className="flex items-center gap-2 md:hidden">
             {isAuthenticated && <NotificationDropdown />}
-            <Button variant="ghost" size="icon" onClick={() => setMobileOpen(!mobileOpen)}>
-              {mobileOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <Button variant="ghost" size="icon" className="h-10 w-10 rounded-xl" onClick={() => setMobileOpen(!mobileOpen)}>
+              {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
             </Button>
           </div>
         </div>
 
         {/* Mobile menu */}
         {mobileOpen && (
-          <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden">
-            <div className="container mx-auto flex flex-col gap-3 px-4 py-4">
-              {navLinks.map((l) => (
-                <Link
-                  key={l.to}
-                  to={l.to}
-                  className="text-sm font-medium text-muted-foreground"
-                  onClick={() => setMobileOpen(false)}
-                >
-                  {l.label}
-                </Link>
-              ))}
-              {isAuthenticated ? (
-                <div className="flex items-center gap-2 pt-2">
-                  <div className="flex items-center gap-2 flex-1">
-                    <div className="flex h-6 w-6 items-center justify-center rounded-full bg-primary text-xs font-bold text-primary-foreground">
-                      {user?.name?.charAt(0) || "U"}
-                    </div>
-                    <span className="text-sm font-medium">{user?.name}</span>
-                    {user?.role && (
-                      <span className="rounded-full bg-primary/10 px-2 py-0.5 text-xs text-primary capitalize">{user.role}</span>
-                    )}
-                  </div>
-                  <Button variant="outline" size="sm" onClick={() => { handleLogout(); setMobileOpen(false); }}>
-                    <LogOut className="mr-1 h-3 w-3" /> Log out
-                  </Button>
-                </div>
-              ) : (
-                <div className="flex gap-2 pt-2">
-                  <Button
-                    className="flex-1 bg-transparent text-muted-foreground hover:bg-primary border border-border/50 hover:text-primary-foreground hover:-translate-y-0 shadow-none hover:shadow-none"
-                    size="sm"
-                    onClick={openLogin}
+          <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden overflow-hidden transition-all duration-300">
+            <div className="container mx-auto flex flex-col gap-4 px-4 py-6">
+              <div className="grid grid-cols-1 gap-2">
+                {navLinks.map((l) => (
+                  <Link
+                    key={l.to}
+                    to={l.to}
+                    className="flex items-center h-12 px-4 rounded-xl text-base font-semibold text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all"
+                    onClick={() => setMobileOpen(false)}
                   >
-                    Log in
-                  </Button>
-                  <Button size="sm" className="flex-1" onClick={openSignup}>
-                    Sign Up
-                  </Button>
-                </div>
-              )}
+                    {l.label}
+                  </Link>
+                ))}
+              </div>
+              
+              <div className="pt-4 mt-2 border-t border-border/50 space-y-4">
+                {!isAuthenticated ? (
+                  <>
+                    <div className="grid grid-cols-2 gap-3">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleQuickLogin("participant")}
+                        className="h-11 rounded-xl font-bold border-border/50"
+                      >
+                        <UserIcon className="mr-2 h-4 w-4" /> User Demo
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        onClick={() => handleQuickLogin("organiser")}
+                        className="h-11 rounded-xl font-bold border-border/50"
+                      >
+                        <Shield className="mr-2 h-4 w-4" /> Host Demo
+                      </Button>
+                    </div>
+                    <div className="flex gap-3">
+                      <Button
+                        variant="ghost"
+                        className="flex-1 h-12 rounded-xl font-bold text-muted-foreground"
+                        onClick={openLogin}
+                      >
+                        Log in
+                      </Button>
+                      <Button className="flex-1 h-12 rounded-xl font-bold" onClick={openSignup}>
+                        Sign Up
+                      </Button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="flex items-center justify-between p-3 rounded-2xl bg-muted/30 border border-border/50">
+                    <div className="flex items-center gap-3">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-bold text-primary-foreground">
+                        {user?.name?.charAt(0) || "U"}
+                      </div>
+                      <div className="flex flex-col">
+                        <span className="text-sm font-bold">{user?.name}</span>
+                        <span className="text-xs text-primary font-medium capitalize">{user?.role}</span>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => { handleLogout(); setMobileOpen(false); }}
+                      className="h-10 w-10 rounded-xl text-destructive hover:bg-destructive/10"
+                    >
+                      <LogOut className="h-5 w-5" />
+                    </Button>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         )}
       </nav>
-
-      {/* Auth Modal */}
-      <AuthModal open={authOpen} onOpenChange={setAuthOpen} defaultView={authView} />
     </>
   );
 };

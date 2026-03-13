@@ -1,181 +1,171 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Trophy, Zap, Users, FileText, Plus, Eye, TrendingUp, Calendar } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Trophy, Users, FileText, Plus, Eye, Settings, Calendar, LayoutDashboard } from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import {
-  dashboardStats,
-  participationTrend,
-  domainDistribution,
-  orgHackathons,
-} from "@/data/organiserMockData";
-import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
-  PieChart, Pie, Cell, Legend,
-} from "recharts";
-
-const iconMap: Record<string, React.ReactNode> = {
-  trophy: <Trophy className="h-5 w-5" />,
-  zap: <Zap className="h-5 w-5" />,
-  users: <Users className="h-5 w-5" />,
-  "file-text": <FileText className="h-5 w-5" />,
-};
-
-const PIE_COLORS = [
-  "hsl(262, 83%, 58%)",
-  "hsl(220, 70%, 55%)",
-  "hsl(142, 76%, 46%)",
-  "hsl(25, 95%, 53%)",
-  "hsl(270, 90%, 65%)",
-];
+import { organizerStats, organizerHackathons } from "@/data/mockDashboards";
 
 const statusColor: Record<string, string> = {
-  draft: "bg-muted text-muted-foreground",
-  open: "bg-accent/20 text-accent",
-  ongoing: "bg-primary/20 text-primary",
-  completed: "bg-secondary/20 text-secondary",
+  upcoming: "bg-accent/20 text-accent border-accent/30",
+  live: "bg-[#d8f524]/20 text-[#d8f524] border-[#d8f524]/30",
+  ended: "bg-secondary/20 text-secondary border-secondary/30",
 };
 
 const OrganiserDashboard = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background text-foreground selection:bg-[#d8f524]/30">
       <Navbar />
       <main className="container mx-auto px-4 pt-24 pb-16">
         {/* Header */}
         <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h1 className="font-heading text-3xl font-bold">Organiser Dashboard</h1>
-            <p className="text-muted-foreground">Manage your hackathons and track performance</p>
+            <h1 className="font-heading text-3xl font-bold tracking-tight">Organizer Dashboard</h1>
+            <p className="text-muted-foreground mt-1">Manage your hackathons and track activity</p>
           </div>
-          <Link to="/organiser/create-hackathon">
-            <Button className="bg-primary text-primary-foreground gap-2">
-              <Plus className="h-4 w-4" /> Create Hackathon
-            </Button>
-          </Link>
+          <div className="flex gap-3">
+            <Link to={organizerHackathons.length > 0 ? `/organizer/hackathon/${organizerHackathons[0].id}/manage` : "#"}>
+              <Button variant="secondary" className="gap-2 border-border/50">
+                <Settings className="h-4 w-4" /> Manage Hackathons
+              </Button>
+            </Link>
+            <Link to="/organizer/create-hackathon">
+              <Button className="bg-[#d8f524] text-black hover:bg-[#d8f524]/90 gap-2 font-medium">
+                <Plus className="h-4 w-4" /> Create Hackathon
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        {/* Stats */}
-        <div className="mb-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {dashboardStats.map((stat, i) => (
-            <motion.div key={stat.label} initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.1 }}>
-              <Card className="border-border/50">
-                <CardContent className="flex items-center gap-4 p-5">
-                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                    {iconMap[stat.icon]}
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{stat.label}</p>
-                    <p className="font-heading text-2xl font-bold">{stat.value.toLocaleString()}</p>
-                    <p className="text-xs text-accent">{stat.change}</p>
-                  </div>
-                </CardContent>
-              </Card>
-            </motion.div>
-          ))}
+        {/* Stats Section */}
+        <div className="mb-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
+            <Card className="border-border/50 bg-card/40 backdrop-blur-sm overflow-hidden relative group">
+              <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-[#d8f524]/50 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <LayoutDashboard className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Hackathons Created</p>
+                  <p className="font-heading text-3xl font-bold">{organizerStats.totalHackathonsCreated}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
+            <Card className="border-border/50 bg-card/40 backdrop-blur-sm overflow-hidden relative group">
+              <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-accent/50 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                  <Users className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Participants</p>
+                  <p className="font-heading text-3xl font-bold">{organizerStats.totalParticipants.toLocaleString()}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="sm:col-span-2 lg:col-span-1">
+            <Card className="border-border/50 bg-card/40 backdrop-blur-sm overflow-hidden relative group">
+              <div className="absolute inset-x-0 bottom-0 h-1 bg-gradient-to-r from-transparent via-secondary/50 to-transparent translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+              <CardContent className="flex items-center gap-4 p-6">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-secondary/10 text-secondary">
+                  <FileText className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-muted-foreground">Total Submissions</p>
+                  <p className="font-heading text-3xl font-bold">{organizerStats.totalSubmissions.toLocaleString()}</p>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
         </div>
 
-        {/* Charts */}
-        <div className="mb-8 grid gap-6 lg:grid-cols-3">
-          <Card className="lg:col-span-2 border-border/50">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2 font-heading text-lg">
-                <TrendingUp className="h-5 w-5 text-primary" /> Participation Trends
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={280}>
-                <BarChart data={participationTrend}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" />
-                  <XAxis dataKey="month" className="text-xs fill-muted-foreground" />
-                  <YAxis className="text-xs fill-muted-foreground" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "0.5rem",
-                      color: "hsl(var(--foreground))",
-                    }}
-                  />
-                  <Bar dataKey="participants" fill="hsl(262, 83%, 58%)" radius={[4, 4, 0, 0]} name="Participants" />
-                  <Bar dataKey="teams" fill="hsl(220, 70%, 55%)" radius={[4, 4, 0, 0]} name="Teams" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          <Card className="border-border/50">
-            <CardHeader>
-              <CardTitle className="font-heading text-lg">Domain Distribution</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={280}>
-                <PieChart>
-                  <Pie data={domainDistribution} cx="50%" cy="50%" outerRadius={90} dataKey="value" label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`} labelLine={false}>
-                    {domainDistribution.map((_, i) => (
-                      <Cell key={i} fill={PIE_COLORS[i % PIE_COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Hackathon list */}
-        <Card className="border-border/50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 font-heading text-lg">
-              <Calendar className="h-5 w-5 text-primary" /> Your Hackathons
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b border-border text-left text-muted-foreground">
-                    <th className="pb-3 font-medium">Title</th>
-                    <th className="pb-3 font-medium">Status</th>
-                    <th className="pb-3 font-medium hidden sm:table-cell">Participants</th>
-                    <th className="pb-3 font-medium hidden sm:table-cell">Teams</th>
-                    <th className="pb-3 font-medium hidden md:table-cell">Dates</th>
-                    <th className="pb-3 font-medium text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {orgHackathons.map((h) => (
-                    <tr key={h.id} className="border-b border-border/50 last:border-0">
-                      <td className="py-3 font-medium">{h.title}</td>
-                      <td className="py-3">
-                        <Badge variant="secondary" className={`capitalize ${statusColor[h.status]}`}>{h.status}</Badge>
-                      </td>
-                      <td className="py-3 hidden sm:table-cell">{h.participants}</td>
-                      <td className="py-3 hidden sm:table-cell">{h.teams}</td>
-                      <td className="py-3 hidden md:table-cell text-muted-foreground">
-                        {new Date(h.startDate).toLocaleDateString()} – {new Date(h.endDate).toLocaleDateString()}
-                      </td>
-                      <td className="py-3 text-right space-x-1">
-                        {(h.status === "ongoing" || h.status === "completed") && (
-                          <Link to={`/organiser/hackathon/${h.id}/submissions`}>
-                            <Button variant="outline" size="sm" className="gap-1">
-                              <FileText className="h-3 w-3" /> Submissions
-                            </Button>
-                          </Link>
-                        )}
-                        <Button variant="ghost" size="sm" className="gap-1">
-                          <Eye className="h-3 w-3" /> View
-                        </Button>
-                      </td>
+        {/* Hackathon List */}
+        <div className="space-y-4">
+          <h2 className="text-xl font-bold font-heading flex items-center gap-2">
+            <Calendar className="h-5 w-5 text-[#d8f524]" /> Your Hackathons
+          </h2>
+          
+          {organizerHackathons.length === 0 ? (
+            <Card className="border-border/30 bg-card/20 backdrop-blur-sm border-dashed">
+              <CardContent className="flex flex-col items-center justify-center py-16 text-center">
+                <div className="h-16 w-16 rounded-full bg-muted/50 flex items-center justify-center mb-4">
+                  <LayoutDashboard className="h-8 w-8 text-muted-foreground/50" />
+                </div>
+                <h3 className="text-lg font-semibold mb-2">No hackathons yet</h3>
+                <p className="text-muted-foreground max-w-sm mb-6">
+                  You haven't created any hackathons yet. Start your journey by creating your first event.
+                </p>
+                <Link to="/organizer/create-hackathon">
+                  <Button className="bg-[#d8f524] text-black hover:bg-[#d8f524]/90">
+                    <Plus className="h-4 w-4 mr-2" /> Create Your First Hackathon
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="border-border/50 bg-card/30 backdrop-blur-md shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b border-border/50 text-left text-muted-foreground bg-muted/20">
+                      <th className="px-6 py-4 font-medium">Hackathon Title</th>
+                      <th className="px-6 py-4 font-medium">Status</th>
+                      <th className="px-6 py-4 font-medium hidden sm:table-cell">Participants</th>
+                      <th className="px-6 py-4 font-medium hidden md:table-cell">Submissions</th>
+                      <th className="px-6 py-4 font-medium text-right">Actions</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
+                  </thead>
+                  <tbody>
+                    {organizerHackathons.map((h, i) => (
+                      <motion.tr 
+                        initial={{ opacity: 0, y: 10 }} 
+                        animate={{ opacity: 1, y: 0 }} 
+                        transition={{ delay: 0.1 * i }}
+                        key={h.id} 
+                        className="border-b border-border/30 last:border-0 hover:bg-muted/10 transition-colors group"
+                      >
+                        <td className="px-6 py-4 font-medium">{h.title}</td>
+                        <td className="px-6 py-4">
+                          <Badge variant="outline" className={`capitalize border ${statusColor[h.status] || "bg-muted text-muted-foreground"}`}>
+                            {h.status}
+                          </Badge>
+                        </td>
+                        <td className="px-6 py-4 hidden sm:table-cell text-muted-foreground">
+                          {h.participantsCount.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 hidden md:table-cell text-muted-foreground">
+                          {h.submissionCount.toLocaleString()}
+                        </td>
+                        <td className="px-6 py-4 text-right">
+                          <div className="flex items-center justify-end gap-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                            <Link to={`/organizer/hackathon/${h.id}/manage`}>
+                              <Button variant="ghost" size="sm" className="h-8 hover:bg-white/5 hover:text-white">
+                                <Settings className="h-3.5 w-3.5 mr-1.5" /> Manage
+                              </Button>
+                            </Link>
+                            <Link to={`/organizer/hackathon/${h.id}/submissions`}>
+                              <Button variant="outline" size="sm" className="h-8 border-border/50 hover:bg-[#d8f524]/10 hover:text-[#d8f524] hover:border-[#d8f524]/30">
+                                <FileText className="h-3.5 w-3.5 mr-1.5" /> Submissions
+                              </Button>
+                            </Link>
+                          </div>
+                        </td>
+                      </motion.tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </Card>
+          )}
+        </div>
       </main>
       <Footer />
     </div>

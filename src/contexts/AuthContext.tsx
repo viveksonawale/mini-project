@@ -17,17 +17,10 @@ interface AuthContextType {
   signup: (name: string, email: string, password: string) => { success: boolean; error?: string };
   logout: () => void;
   selectRole: (role: UserRole) => void;
+  quickLogin: (role: UserRole) => void;
 }
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
-
-// Mock user database
-const mockUsers: { name: string; email: string; password: string; role: UserRole }[] = [
-  { name: "Jayesh", email: "organiser@evnova", password: "password", role: "organiser" },
-  { name: "Vivek", email: "participant@evnova", password: "password", role: "participant" },
-];
-
-let nextId = 3;
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(() => {
@@ -37,25 +30,50 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const persist = (u: User | null) => {
     setUser(u);
-    if (u) localStorage.setItem("evnova-user", JSON.stringify(u));
-    else localStorage.removeItem("evnova-user");
+    if (u) {
+      localStorage.setItem("evnova-user", JSON.stringify(u));
+    } else {
+      localStorage.removeItem("evnova-user");
+    }
   };
 
-  const login = useCallback((email: string, password: string) => {
-    const found = mockUsers.find((u) => u.email === email && u.password === password);
-    if (!found) return { success: false, error: "Invalid email or password" };
-    const u: User = { id: String(mockUsers.indexOf(found) + 1), name: found.name, email: found.email, role: found.role };
-    persist(u);
+  const login = useCallback((email: string, _password: string) => {
+    // Basic validation
+    if (!email) return { success: false, error: "Email is required" };
+    
+    // Dummy login: accept anything
+    const name = email.split('@')[0];
+    const dummyUser: User = { 
+      id: Math.random().toString(36).substr(2, 9), 
+      name: name.charAt(0).toUpperCase() + name.slice(1), 
+      email: email, 
+      role: email.includes('host') ? 'organiser' : 'participant' 
+    };
+    persist(dummyUser);
     return { success: true };
   }, []);
 
-  const signup = useCallback((name: string, email: string, password: string) => {
-    if (mockUsers.find((u) => u.email === email)) return { success: false, error: "Email already exists" };
-    const newUser = { name, email, password, role: null as UserRole };
-    mockUsers.push(newUser);
-    const u: User = { id: String(nextId++), name, email, role: null };
-    persist(u);
+  const signup = useCallback((name: string, email: string, _password: string) => {
+    if (!email || !name) return { success: false, error: "Name and email are required" };
+    
+    const dummyUser: User = { 
+      id: Math.random().toString(36).substr(2, 9), 
+      name, 
+      email, 
+      role: null 
+    };
+    persist(dummyUser);
     return { success: true };
+  }, []);
+
+  const quickLogin = useCallback((role: UserRole) => {
+    const dummyUser: User = {
+      id: role === "organiser" ? "org-1" : "part-1",
+      name: role === "organiser" ? "Host User" : "Participant User",
+      email: role === "organiser" ? "host@evnova.com" : "user@evnova.com",
+      role: role
+    };
+    persist(dummyUser);
   }, []);
 
   const logout = useCallback(() => persist(null), []);
@@ -65,15 +83,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       if (!prev) return prev;
       const updated = { ...prev, role };
       localStorage.setItem("evnova-user", JSON.stringify(updated));
-      // Also update mock DB
-      const found = mockUsers.find((u) => u.email === prev.email);
-      if (found) found.role = role;
       return updated;
     });
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, signup, logout, selectRole }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, signup, logout, selectRole, quickLogin }}>
       {children}
     </AuthContext.Provider>
   );

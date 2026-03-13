@@ -1,12 +1,16 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Calendar, MapPin, Globe, Trophy, Users, Clock, ArrowLeft, UserPlus, type LucideIcon } from "lucide-react";
+import { 
+  Calendar, MapPin, Globe, Trophy, Users, Clock, 
+  ArrowLeft, UserPlus, FileText, CheckCircle2, Target,
+  Lightbulb, ChevronRight, Award, AlignLeft, ShieldCheck
+} from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { mockHackathons } from "@/data/mockData";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import { mockHackathons } from "@/data/mockHackathons";
 import { useAuth } from "@/contexts/AuthContext";
 
 const HackathonDetail = () => {
@@ -17,92 +21,277 @@ const HackathonDetail = () => {
 
   if (!h) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-zinc-950 text-zinc-50 flex flex-col">
         <Navbar />
-        <div className="container mx-auto px-4 pt-24 text-center">
-          <p className="text-xl text-muted-foreground">Hackathon not found.</p>
-          <Link to="/hackathons"><Button variant="link">Browse hackathons</Button></Link>
+        <div className="flex-1 flex flex-col items-center justify-center container mx-auto px-4 pt-24 text-center">
+          <p className="text-xl text-zinc-400 mb-4">Hackathon not found.</p>
+          <Link to="/hackathons">
+            <Button className="bg-lime-500 hover:bg-lime-600 text-black">Browse hackathons</Button>
+          </Link>
         </div>
+        <Footer />
       </div>
     );
   }
 
   const handleRegister = () => {
-    if (!isAuthenticated) { navigate("/login"); return; }
-    navigate(`/hackathons/${h.id}/register`);
+    if (!isAuthenticated) {
+      navigate("/login");
+      return;
+    }
+    alert(`Successfully joined ${h.title}!`);
+  };
+
+  const statusColors = {
+    live: "bg-green-500/10 text-green-500 border-green-500/20",
+    upcoming: "bg-blue-500/10 text-blue-500 border-blue-500/20",
+    ended: "bg-zinc-500/10 text-zinc-400 border-zinc-500/20",
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-zinc-950 text-zinc-50 selection:bg-lime-500/30 font-sans dark">
       <Navbar />
-      <main className="container mx-auto px-4 pt-24 pb-16">
-        <Link to="/hackathons" className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
-          <ArrowLeft className="h-4 w-4" /> Back to hackathons
-        </Link>
+      
+      <main className="container max-w-5xl mx-auto px-4 pt-28 pb-20 space-y-16">
+        
+        {/* SECTION 1 — Hackathon Header */}
+        <section className="relative space-y-6">
+          <Link to="/hackathons" className="inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors">
+            <ArrowLeft className="h-4 w-4" /> Back to hackathons
+          </Link>
+          
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            <div className="flex flex-wrap items-center gap-3">
+              <Badge variant="outline" className={`capitalize px-3 py-1 ${statusColors[h.status]}`}>
+                <span className="relative flex h-2 w-2 mr-2">
+                  <span className={`animate-ping absolute inline-flex h-full w-full rounded-full opacity-75 ${h.status === 'live' ? 'bg-green-400' : 'hidden'}`}></span>
+                  <span className={`relative inline-flex rounded-full h-2 w-2 ${h.status === 'live' ? 'bg-green-500' : h.status === 'upcoming' ? 'bg-blue-500' : 'bg-zinc-500'}`}></span>
+                </span>
+                {h.status}
+              </Badge>
+              <Badge variant="outline" className="bg-zinc-900 border-zinc-800 text-zinc-300 px-3 py-1">
+                {h.type === "online" ? <Globe className="w-3 h-3 mr-2 inline" /> : <MapPin className="w-3 h-3 mr-2 inline" />}
+                {h.type === "online" ? "Online" : "Offline"}
+              </Badge>
+              <Badge variant="outline" className="bg-zinc-900 border-zinc-800 text-zinc-300 px-3 py-1">
+                <Users className="w-3 h-3 mr-2 inline" />
+                {h.participants} Joined
+              </Badge>
+            </div>
 
-        {/* Banner */}
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
-          className={`rounded-2xl bg-primary p-8 md:p-12 mb-8`}>
-          <div className="flex flex-wrap gap-2 mb-4">
-            <Badge className="bg-background/20 text-primary-foreground backdrop-blur-sm">{h.status}</Badge>
-            <Badge className="bg-background/20 text-primary-foreground backdrop-blur-sm">{h.type === "online" ? "🌐 Online" : "📍 Offline"}</Badge>
-          </div>
-          <h1 className="text-3xl md:text-5xl font-bold font-heading text-primary-foreground mb-2">{h.title}</h1>
-          <p className="text-primary-foreground/80 text-lg max-w-2xl">{h.description}</p>
-          <p className="text-primary-foreground/60 text-sm mt-4">Organised by {h.organiser}</p>
-        </motion.div>
+            <div className="max-w-3xl space-y-4">
+              <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white">{h.title}</h1>
+              <p className="text-xl text-zinc-400 leading-relaxed">{h.shortDescription}</p>
+            </div>
 
-        <div className="grid md:grid-cols-3 gap-8">
-          {/* Main Info */}
-          <div className="md:col-span-2 space-y-6">
-            <Card>
-              <CardHeader><CardTitle>Details</CardTitle></CardHeader>
-              <CardContent className="grid sm:grid-cols-2 gap-4">
-                <InfoRow icon={Calendar} label="Start Date" value={h.startDate} />
-                <InfoRow icon={Calendar} label="End Date" value={h.endDate} />
-                <InfoRow icon={Clock} label="Registration Deadline" value={h.registrationDeadline} />
-                <InfoRow icon={Users} label="Max Team Size" value={String(h.maxTeamSize)} />
-                {h.venue && <InfoRow icon={MapPin} label="Venue" value={h.venue} />}
-                {h.type === "online" && <InfoRow icon={Globe} label="Mode" value="Online" />}
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader><CardTitle>Themes</CardTitle></CardHeader>
-              <CardContent className="flex flex-wrap gap-2">
-                {h.themes.map((t) => (
-                  <Badge key={t} variant="secondary" className="text-sm">{t}</Badge>
-                ))}
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Sidebar */}
-          <div className="space-y-6">
-            <Card className="border-primary/30">
-              <CardContent className="p-6 text-center space-y-4">
-                <Trophy className="h-10 w-10 mx-auto text-primary" />
+            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 pt-4 border-t border-zinc-800/50 mt-8">
+              <div className="flex items-center gap-6 flex-1">
                 <div>
-                  <p className="text-sm text-muted-foreground">Prize Pool</p>
-                  <p className="text-3xl font-bold font-heading">{h.prizePool}</p>
+                  <p className="text-sm text-zinc-500 mb-1">Prize Pool</p>
+                  <p className="text-2xl font-bold text-lime-400">{h.prizePool}</p>
                 </div>
-                <div className="grid grid-cols-2 gap-4 text-center">
-                  <div>
-                    <p className="text-2xl font-bold">{h.participants}</p>
-                    <p className="text-xs text-muted-foreground">Participants</p>
-                  </div>
-                  <div>
-                    <p className="text-2xl font-bold">{h.teams}</p>
-                    <p className="text-xs text-muted-foreground">Teams</p>
-                  </div>
+                <div className="h-12 w-px bg-zinc-800 shrink-0"></div>
+                <div>
+                  <p className="text-sm text-zinc-500 mb-1">Registration Closes</p>
+                  <p className="text-lg font-medium text-zinc-200">{new Date(h.timeline.registrationEnd).toLocaleDateString()}</p>
                 </div>
-                {(h.status === "open" || h.status === "upcoming") && (
-                  <Button onClick={handleRegister} className="w-full bg-primary text-primary-foreground gap-2">
-                    <UserPlus className="h-4 w-4" /> Register Now
+              </div>
+
+              <div className="w-full sm:w-auto mt-4 sm:mt-0">
+                {(h.status === "live" || h.status === "upcoming") ? (
+                  <Button 
+                    onClick={handleRegister} 
+                    size="lg" 
+                    className="w-full sm:w-auto bg-lime-500 hover:bg-lime-600 text-black font-semibold shadow-[0_0_20px_rgba(132,204,22,0.3)] hover:shadow-[0_0_30px_rgba(132,204,22,0.5)] transition-all duration-300 text-lg px-8 h-14"
+                  >
+                    <UserPlus className="mr-2 h-5 w-5" />
+                    Join Hackathon
+                  </Button>
+                ) : (
+                  <Button disabled size="lg" className="w-full sm:w-auto bg-zinc-800 text-zinc-500 font-semibold text-lg px-8 h-14">
+                    Hackathon Ended
                   </Button>
                 )}
+              </div>
+            </div>
+          </motion.div>
+        </section>
+
+        <div className="grid lg:grid-cols-3 gap-8 items-start">
+          
+          <div className="lg:col-span-2 space-y-12">
+            
+            {/* SECTION 2 — Overview */}
+            <section className="space-y-6 scroll-mt-24" id="overview">
+              <div className="flex items-center gap-2 text-2xl font-bold text-white mb-6">
+                <AlignLeft className="h-6 w-6 text-lime-500" />
+                <h2>Overview</h2>
+              </div>
+              
+              <div className="prose prose-invert max-w-none text-zinc-300 space-y-6">
+                <p className="text-lg leading-relaxed">{h.description}</p>
+                
+                <Card className="bg-zinc-900/50 border-zinc-800/50">
+                  <CardHeader>
+                    <CardTitle className="flex items-center gap-2 text-lg text-white">
+                      <Target className="h-5 w-5 text-lime-500" />
+                      Problem Statement
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-zinc-400 leading-relaxed">{h.problemStatement}</p>
+                  </CardContent>
+                </Card>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <Card className="bg-zinc-900/50 border-zinc-800/50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg text-white">
+                        <Lightbulb className="h-5 w-5 text-lime-500" />
+                        Themes
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="flex flex-wrap gap-2">
+                      {h.theme.map((t) => (
+                        <Badge key={t} variant="secondary" className="bg-zinc-800 hover:bg-zinc-700 text-zinc-200">{t}</Badge>
+                      ))}
+                    </CardContent>
+                  </Card>
+                  
+                  <Card className="bg-zinc-900/50 border-zinc-800/50">
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2 text-lg text-white">
+                        <CheckCircle2 className="h-5 w-5 text-lime-500" />
+                        Goals
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <ul className="space-y-2 text-zinc-400">
+                        {h.goals.map((g, i) => (
+                          <li key={i} className="flex items-start gap-2">
+                            <span className="text-lime-500 mt-1 shrink-0">•</span>
+                            <span className="text-sm">{g}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  </Card>
+                </div>
+              </div>
+            </section>
+
+            <hr className="border-zinc-800/50" />
+
+            {/* SECTION 4 — Rules */}
+            <section className="space-y-6 scroll-mt-24" id="rules">
+              <div className="flex items-center gap-2 text-2xl font-bold text-white mb-6">
+                <ShieldCheck className="h-6 w-6 text-lime-500" />
+                <h2>Rules & Requirements</h2>
+              </div>
+              <Card className="bg-zinc-900/50 border-zinc-800/50 overflow-hidden">
+                <div className="divide-y divide-zinc-800/50">
+                  {h.rules.map((rule, idx) => (
+                    <div key={idx} className="p-4 sm:p-5 flex items-start gap-4 hover:bg-zinc-800/20 transition-colors">
+                      <div className="bg-zinc-800/80 rounded-full h-8 w-8 flex items-center justify-center shrink-0 text-lime-500 font-medium text-sm">
+                        {idx + 1}
+                      </div>
+                      <p className="text-zinc-300 mt-1">{rule}</p>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            </section>
+            
+            <hr className="border-zinc-800/50 block lg:hidden" />
+          </div>
+
+          {/* Right Sidebar */}
+          <div className="space-y-8 lg:sticky lg:top-28">
+            
+            {/* SECTION 3 — Timeline */}
+            <Card className="bg-zinc-900/80 border-zinc-800 backdrop-blur-xl">
+              <CardHeader className="pb-4">
+                <CardTitle className="flex items-center gap-2 text-lg text-white">
+                  <Clock className="h-5 w-5 text-lime-500" />
+                  Timeline
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="relative border-l border-zinc-700/50 ml-3 space-y-6 pb-2">
+                  <TimelineItem 
+                    title="Registration Opens" 
+                    date={h.timeline.registrationStart} 
+                    isActive={new Date() >= new Date(h.timeline.registrationStart)} 
+                  />
+                  <TimelineItem 
+                    title="Registration Ends" 
+                    date={h.timeline.registrationEnd} 
+                    isActive={new Date() >= new Date(h.timeline.registrationEnd)} 
+                  />
+                  <TimelineItem 
+                    title="Hackathon Starts" 
+                    date={h.timeline.hackathonStart} 
+                    isActive={new Date() >= new Date(h.timeline.hackathonStart)} 
+                  />
+                  <TimelineItem 
+                    title="Submission Deadline" 
+                    date={h.timeline.submissionDeadline} 
+                    isActive={new Date() >= new Date(h.timeline.submissionDeadline)} 
+                    isLast 
+                  />
+                </div>
               </CardContent>
             </Card>
+
+            {/* SECTION 5 — Prizes */}
+            <Card className="bg-zinc-900/80 border-zinc-800 backdrop-blur-xl overflow-hidden">
+              <div className="bg-gradient-to-r from-lime-500/10 to-transparent p-6 border-b border-zinc-800">
+                <h3 className="flex items-center gap-2 text-lg font-bold text-white mb-1">
+                  <Trophy className="h-5 w-5 text-lime-500" />
+                  Prize Tiers
+                </h3>
+                <p className="text-zinc-400 text-sm">Total Pool: <span className="text-lime-400 font-bold">{h.prizePool}</span></p>
+              </div>
+              <CardContent className="p-0">
+                <div className="divide-y divide-zinc-800/50">
+                  {h.prizes.map((prize, i) => (
+                    <div key={i} className="p-6 flex flex-col gap-1 hover:bg-zinc-800/20 transition-colors">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="font-semibold text-white flex items-center gap-2">
+                          {i === 0 && <Award className="h-4 w-4 text-yellow-500" />}
+                          {i === 1 && <Award className="h-4 w-4 text-zinc-300" />}
+                          {i === 2 && <Award className="h-4 w-4 text-orange-400" />}
+                          {prize.position}
+                        </span>
+                        <span className="text-lg font-bold text-lime-400">{prize.amount}</span>
+                      </div>
+                      <p className="text-sm text-zinc-400">{prize.description}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* SECTION 6 — Participants */}
+            <Card className="bg-zinc-900/80 border-zinc-800 backdrop-blur-xl">
+              <CardContent className="p-6 text-center space-y-4">
+                <div className="flex justify-center -space-x-4 mb-4">
+                  {[...Array(5)].map((_, i) => (
+                    <div key={i} className="w-10 h-10 rounded-full border-2 border-zinc-900 bg-zinc-800 flex items-center justify-center shrink-0">
+                      <Users className="w-4 h-4 text-zinc-500" />
+                    </div>
+                  ))}
+                  <div className="w-10 h-10 rounded-full border-2 border-zinc-900 bg-zinc-800 flex items-center justify-center shrink-0 z-10 text-xs text-zinc-400 font-medium">
+                    +{h.participants - 5}
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-medium text-white text-lg">{h.participants} Hackers</h4>
+                  <p className="text-sm text-zinc-400">have already registered</p>
+                </div>
+              </CardContent>
+            </Card>
+
           </div>
         </div>
       </main>
@@ -111,12 +300,13 @@ const HackathonDetail = () => {
   );
 };
 
-const InfoRow = ({ icon: Icon, label, value }: { icon: LucideIcon; label: string; value: string }) => (
-  <div className="flex items-start gap-3">
-    <Icon className="h-5 w-5 text-primary mt-0.5" />
+// Helper component for timeline
+const TimelineItem = ({ title, date, isActive, isLast = false }: { title: string, date: string, isActive: boolean, isLast?: boolean }) => (
+  <div className="relative pl-6">
+    <div className={`absolute -left-[5px] top-1.5 h-2.5 w-2.5 rounded-full border-2 bg-zinc-900 ${isActive ? 'border-lime-500' : 'border-zinc-700'}`}></div>
     <div>
-      <p className="text-xs text-muted-foreground">{label}</p>
-      <p className="font-medium">{value}</p>
+      <h4 className={`text-sm font-medium ${isActive ? 'text-zinc-200' : 'text-zinc-500'}`}>{title}</h4>
+      <p className="text-xs text-zinc-500 mt-1">{new Date(date).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</p>
     </div>
   </div>
 );

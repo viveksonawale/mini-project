@@ -11,6 +11,7 @@ import NotFound from "./pages/public/NotFound";
 import Login from "./pages/auth/Login";
 import Signup from "./pages/auth/Signup";
 import ForgotPassword from "./pages/auth/ForgotPassword";
+import ProtectedRoute from "./components/auth/ProtectedRoute";
 import OrganiserDashboard from "./pages/organizer/Dashboard";
 import CreateHackathon from "./pages/organizer/CreateHackathon";
 import ReviewSubmissions from "./pages/organizer/ReviewSubmissions";
@@ -48,15 +49,19 @@ const App = () => (
                 <Route path="/forgot-password" element={<ForgotPassword />} />
 
                 {/* Organizer Routes */}
-                <Route path="/organizer/dashboard" element={<OrganiserDashboard />} />
-                <Route path="/organizer/create-hackathon" element={<CreateHackathon />} />
-                <Route path="/organizer/hackathon/:hackathonId/manage" element={<ManageHackathon />} />
-                <Route path="/organizer/hackathon/:hackathonId/submissions" element={<ReviewSubmissions />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/organizer/dashboard" element={<OrganiserDashboard />} />
+                  <Route path="/organizer/create-hackathon" element={<CreateHackathon />} />
+                  <Route path="/organizer/hackathon/:hackathonId/manage" element={<ManageHackathon />} />
+                  <Route path="/organizer/hackathon/:hackathonId/submissions" element={<ReviewSubmissions />} />
+                </Route>
 
                 {/* Participant Routes */}
-                <Route path="/participant/dashboard" element={<ParticipantDashboard />} />
-                <Route path="/participant/hackathons/:hackathonId/team" element={<TeamManagement />} />
-                <Route path="/participant/hackathons/:hackathonId/submit" element={<SubmitProject />} />
+                <Route element={<ProtectedRoute />}>
+                  <Route path="/participant/dashboard" element={<ParticipantDashboard />} />
+                  <Route path="/participant/hackathons/:hackathonId/team" element={<TeamManagement />} />
+                  <Route path="/participant/hackathons/:hackathonId/submit" element={<SubmitProject />} />
+                </Route>
 
                 <Route path="*" element={<NotFound />} />
               </Routes>

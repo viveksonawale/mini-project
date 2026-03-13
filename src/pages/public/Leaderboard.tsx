@@ -1,186 +1,237 @@
-import { useParams, Link } from "react-router-dom";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeft, Trophy, Medal, Star, Github, ExternalLink } from "lucide-react";
+import { Trophy, Medal, Star, Filter } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { submissions, orgHackathons, type Submission } from "@/data/organiserMockData";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { mockSubmissions, type ProjectSubmission } from "@/data/mockSubmissions";
+import { mockHackathons } from "@/data/mockHackathons";
 
-const rankStyle = [
-  "bg-[hsl(45,93%,47%)] text-background",
-  "bg-[hsl(210,10%,70%)] text-background",
-  "bg-[hsl(30,60%,50%)] text-background",
-];
+const rankBadgeClass = (rank: number) => {
+  if (rank === 1) return "bg-[hsl(45,93%,47%)] text-background";
+  if (rank === 2) return "bg-[hsl(210,10%,70%)] text-background";
+  if (rank === 3) return "bg-[hsl(30,60%,50%)] text-background";
+  return "bg-muted text-muted-foreground";
+};
+
+const rankIcon = (rank: number) => {
+  if (rank === 1) return <Trophy className="h-4 w-4" />;
+  if (rank === 2) return <Medal className="h-4 w-4" />;
+  if (rank === 3) return <Star className="h-4 w-4" />;
+  return rank;
+};
 
 const Leaderboard = () => {
-  const { hackathonId } = useParams();
-  const hackathon = orgHackathons.find((h) => h.id === hackathonId);
+  const [selectedHackathon, setSelectedHackathon] = useState<string>("all");
 
-  const ranked = submissions
-    .filter((s) => s.hackathonId === hackathonId && s.totalScore > 0)
-    .sort((a, b) => b.totalScore - a.totalScore);
+  // Get unique hackathons from submissions
+  const hackathonOptions = [
+    ...new Map(
+      mockSubmissions.map((s) => [s.hackathonId, { id: s.hackathonId, title: s.hackathonTitle }])
+    ).values(),
+  ];
 
-  const unscored = submissions.filter((s) => s.hackathonId === hackathonId && s.totalScore === 0);
-
-  if (!hackathon) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <div className="container mx-auto px-4 pt-24 text-center">
-          <p className="text-muted-foreground">Hackathon not found.</p>
-        </div>
-      </div>
-    );
-  }
+  // Filter and sort
+  const filtered = (
+    selectedHackathon === "all"
+      ? [...mockSubmissions]
+      : mockSubmissions.filter((s) => s.hackathonId === selectedHackathon)
+  ).sort((a, b) => b.score - a.score);
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-24 pb-16 max-w-4xl">
-        <Link to={`/organiser/hackathon/${hackathonId}/submissions`} className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground mb-6">
-          <ArrowLeft className="h-4 w-4" /> Back to Submissions
-        </Link>
-
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8 text-center">
-          <Trophy className="h-10 w-10 text-accent mx-auto mb-2" />
-          <h1 className="font-heading text-3xl font-bold">Leaderboard</h1>
-          <p className="text-muted-foreground">{hackathon.title}</p>
+      <main className="container mx-auto px-4 pt-24 pb-16 max-w-5xl">
+        {/* Page Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="mb-10 border-b border-border/50 pb-8"
+        >
+          <div className="flex items-center gap-3 mb-2">
+            <div className="h-12 w-12 rounded-2xl bg-primary/10 flex items-center justify-center">
+              <Trophy className="h-6 w-6 text-primary" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold font-heading tracking-tight">Leaderboard</h1>
+              <p className="text-muted-foreground">Top performing teams across hackathons.</p>
+            </div>
+          </div>
         </motion.div>
 
         {/* Top 3 Podium */}
-        {ranked.length >= 3 && (
-          <div className="grid grid-cols-3 gap-4 mb-10">
-            {[ranked[1], ranked[0], ranked[2]].map((sub, podiumIdx) => {
-              const actualRank = podiumIdx === 0 ? 2 : podiumIdx === 1 ? 1 : 3;
+        {filtered.length >= 3 && (
+          <motion.div
+            initial={{ opacity: 0, y: 15 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.1 }}
+            className="grid grid-cols-3 gap-4 mb-10"
+          >
+            {[filtered[1], filtered[0], filtered[2]].map((sub, idx) => {
+              const rank = idx === 0 ? 2 : idx === 1 ? 1 : 3;
               return (
                 <motion.div
                   key={sub.id}
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: podiumIdx * 0.15 }}
-                  className={podiumIdx === 1 ? "-mt-4" : "mt-4"}
+                  transition={{ delay: 0.15 + idx * 0.1 }}
+                  className={idx === 1 ? "-mt-2" : "mt-6"}
                 >
-                  <Card className={`text-center border-border/50 ${actualRank === 1 ? "ring-2 ring-accent/50" : ""}`}>
-                    <CardContent className="p-5 space-y-2">
-                      <div className={`h-10 w-10 mx-auto rounded-full flex items-center justify-center text-sm font-bold ${rankStyle[actualRank - 1]}`}>
-                        {actualRank}
+                  <Card
+                    className={`text-center border-border/50 transition-all hover:border-primary/30 ${
+                      rank === 1 ? "ring-2 ring-primary/30 shadow-[0_0_20px_rgba(216,245,36,0.08)]" : ""
+                    }`}
+                  >
+                    <CardContent className="p-5 space-y-3">
+                      <div
+                        className={`h-11 w-11 mx-auto rounded-full flex items-center justify-center font-bold text-sm ${rankBadgeClass(
+                          rank
+                        )}`}
+                      >
+                        {rankIcon(rank)}
                       </div>
-                      <h3 className="font-heading font-bold text-sm">{sub.projectTitle}</h3>
-                      <p className="text-xs text-muted-foreground">{sub.teamName}</p>
-                      <p className="text-2xl font-bold font-heading">{sub.totalScore}<span className="text-xs text-muted-foreground font-normal">/40</span></p>
+                      <div>
+                        <h3 className="font-heading font-bold text-sm leading-tight">{sub.projectName}</h3>
+                        <p className="text-xs text-muted-foreground mt-0.5">{sub.teamName}</p>
+                      </div>
+                      <Badge variant="outline" className="text-[10px] px-2 py-0.5">
+                        {sub.hackathonTitle}
+                      </Badge>
+                      <p className="text-3xl font-bold font-heading">
+                        {sub.score}
+                        <span className="text-xs text-muted-foreground font-normal"> pts</span>
+                      </p>
                     </CardContent>
                   </Card>
                 </motion.div>
               );
             })}
-          </div>
+          </motion.div>
         )}
 
-        {/* Full ranking */}
-        <div className="space-y-3">
-          {ranked.map((sub, i) => (
-            <RankCard key={sub.id} submission={sub} rank={i + 1} index={i} />
-          ))}
-        </div>
+        {/* Filter Section */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.25 }}
+          className="mb-6"
+        >
+          <Card className="border-border/50">
+            <CardContent className="p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground shrink-0">
+                <Filter className="h-4 w-4" />
+                <span className="font-medium">Filter by Hackathon</span>
+              </div>
+              <Select value={selectedHackathon} onValueChange={setSelectedHackathon}>
+                <SelectTrigger className="w-full sm:w-[280px] h-10">
+                  <SelectValue placeholder="Select Hackathon" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Hackathons</SelectItem>
+                  {hackathonOptions.map((h) => (
+                    <SelectItem key={h.id} value={h.id}>
+                      {h.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+              <div className="ml-auto">
+                <Badge variant="secondary" className="text-xs">
+                  {filtered.length} {filtered.length === 1 ? "team" : "teams"}
+                </Badge>
+              </div>
+            </CardContent>
+          </Card>
+        </motion.div>
 
-        {unscored.length > 0 && (
-          <div className="mt-10">
-            <h2 className="font-heading text-lg font-bold mb-4 text-muted-foreground">Awaiting Review ({unscored.length})</h2>
-            <div className="space-y-2">
-              {unscored.map((sub) => (
-                <Card key={sub.id} className="border-border/30 opacity-60">
-                  <CardContent className="p-4 flex items-center justify-between">
-                    <div>
-                      <p className="font-medium text-sm">{sub.projectTitle}</p>
-                      <p className="text-xs text-muted-foreground">{sub.teamName}</p>
-                    </div>
-                    <Badge className="bg-muted text-muted-foreground">Pending</Badge>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        )}
+        {/* Leaderboard Table */}
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.3 }}
+        >
+          <Card className="border-border/50 shadow-md overflow-hidden">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/30 hover:bg-muted/30">
+                  <TableHead className="w-20 text-center font-heading font-bold">Rank</TableHead>
+                  <TableHead className="font-heading font-bold">Team Name</TableHead>
+                  <TableHead className="font-heading font-bold hidden sm:table-cell">Hackathon</TableHead>
+                  <TableHead className="w-24 text-center font-heading font-bold">Score</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {filtered.map((sub, i) => {
+                  const rank = i + 1;
+                  return (
+                    <motion.tr
+                      key={sub.id}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.35 + i * 0.04 }}
+                      className={`border-b border-border/30 transition-colors hover:bg-muted/20 ${
+                        rank <= 3 ? "bg-primary/[0.02]" : ""
+                      }`}
+                    >
+                      <TableCell className="text-center">
+                        <div
+                          className={`h-8 w-8 mx-auto rounded-full flex items-center justify-center font-bold text-xs ${rankBadgeClass(
+                            rank
+                          )}`}
+                        >
+                          {rankIcon(rank)}
+                        </div>
+                      </TableCell>
+                      <TableCell>
+                        <div>
+                          <p className="font-semibold text-sm">{sub.teamName}</p>
+                          <p className="text-xs text-muted-foreground">{sub.projectName}</p>
+                        </div>
+                      </TableCell>
+                      <TableCell className="hidden sm:table-cell">
+                        <Badge variant="outline" className="text-xs">
+                          {sub.hackathonTitle}
+                        </Badge>
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <span className={`font-heading font-bold text-lg ${rank <= 3 ? "text-primary" : ""}`}>
+                          {sub.score}
+                        </span>
+                      </TableCell>
+                    </motion.tr>
+                  );
+                })}
+              </TableBody>
+            </Table>
 
-        {ranked.length === 0 && (
-          <div className="text-center py-16 text-muted-foreground">
-            <p className="text-lg">No scored submissions yet.</p>
-            <Link to={`/organiser/hackathon/${hackathonId}/submissions`}>
-              <Button variant="link">Start reviewing</Button>
-            </Link>
-          </div>
-        )}
+            {filtered.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <Trophy className="h-10 w-10 mx-auto mb-3 opacity-30" />
+                <p className="text-lg font-heading">No submissions yet</p>
+                <p className="text-sm mt-1">Rankings will appear once teams submit their projects.</p>
+              </div>
+            )}
+          </Card>
+        </motion.div>
       </main>
       <Footer />
     </div>
-  );
-};
-
-
-const RankCard = ({ submission: sub, rank, index }: { submission: Submission; rank: number; index: number }) => {
-  const criteria = [
-    { key: "innovation" as const, label: "Innovation", color: "bg-primary" },
-    { key: "execution" as const, label: "Execution", color: "bg-secondary" },
-    { key: "design" as const, label: "Design", color: "bg-accent" },
-    { key: "impact" as const, label: "Impact", color: "bg-[hsl(var(--evnova-orange))]" },
-  ];
-
-  return (
-    <motion.div initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.06 }}>
-      <Card className={`border-border/50 ${rank <= 3 ? "ring-1 ring-accent/20" : ""}`}>
-        <CardContent className="p-5">
-          <div className="flex flex-col sm:flex-row sm:items-center gap-4">
-            {/* Rank badge */}
-            <div className={`h-10 w-10 shrink-0 rounded-full flex items-center justify-center font-bold text-sm ${rank <= 3 ? rankStyle[rank - 1] : "bg-muted text-muted-foreground"}`}>
-              {rank <= 3 ? <Medal className="h-5 w-5" /> : rank}
-            </div>
-
-            {/* Info */}
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 flex-wrap">
-                <h3 className="font-heading font-semibold">{sub.projectTitle}</h3>
-                {sub.status === "winner" && <Badge className="bg-accent/20 text-accent">🏆 Winner</Badge>}
-                {sub.status === "shortlisted" && <Badge className="bg-primary/20 text-primary">Shortlisted</Badge>}
-              </div>
-              <p className="text-sm text-muted-foreground">{sub.teamName} • {sub.members.length} members</p>
-              <div className="flex flex-wrap gap-1 mt-1">
-                {sub.techStack.slice(0, 3).map((t) => <Badge key={t} variant="outline" className="text-xs">{t}</Badge>)}
-              </div>
-
-              {/* Score bars */}
-              <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 mt-3">
-                {criteria.map((c) => (
-                  <div key={c.key} className="flex items-center gap-2">
-                    <span className="text-xs text-muted-foreground w-16">{c.label}</span>
-                    <Progress value={sub.scores[c.key] * 10} className="h-1.5 flex-1" />
-                    <span className="text-xs font-medium w-4 text-right">{sub.scores[c.key]}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Total score */}
-            <div className="text-right shrink-0">
-              <p className="text-3xl font-bold font-heading">{sub.totalScore}</p>
-              <p className="text-xs text-muted-foreground">/ 40 pts</p>
-              <div className="flex gap-1 mt-2 justify-end">
-                <a href={sub.githubUrl} target="_blank" rel="noreferrer">
-                  <Button size="icon" variant="ghost" className="h-7 w-7"><Github className="h-3.5 w-3.5" /></Button>
-                </a>
-                {sub.demoUrl && (
-                  <a href={sub.demoUrl} target="_blank" rel="noreferrer">
-                    <Button size="icon" variant="ghost" className="h-7 w-7"><ExternalLink className="h-3.5 w-3.5" /></Button>
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </motion.div>
   );
 };
 
