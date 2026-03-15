@@ -13,25 +13,31 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const { login, quickLogin } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const result = login(email, password);
-    if (result.success) {
-      toast({ title: "Welcome back!", description: "You've been logged in successfully." });
-      navigate("/");
-    } else {
-      toast({ title: "Login failed", description: result.error, variant: "destructive" });
+    setIsLoading(true);
+    try {
+      const result = await login(email, password);
+      if (result.success) {
+        toast({ title: "Welcome back!", description: "You've been logged in successfully." });
+        navigate("/");
+      } else {
+        toast({ title: "Login failed", description: result.error, variant: "destructive" });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const handleQuickLogin = (role: "organiser" | "participant") => {
+  const handleQuickLogin = (role: "ORGANIZER" | "PARTICIPANT") => {
     quickLogin(role);
     toast({ 
-      title: `Logged in as ${role === 'organiser' ? 'Host' : 'Participant'}`, 
+      title: `Logged in as ${role === 'ORGANIZER' ? 'Host' : 'Participant'}`, 
       description: "You've been logged in automatically." 
     });
     navigate("/");
@@ -162,7 +168,7 @@ const Login = () => {
                   <Button 
                     type="button"
                     variant="outline"
-                    onClick={() => handleQuickLogin("participant")}
+                    onClick={() => handleQuickLogin("PARTICIPANT")}
                     className="h-11 border-border/50 hover:bg-primary/10 hover:border-primary/50 transition-all rounded-lg"
                   >
                     Participant
@@ -170,7 +176,7 @@ const Login = () => {
                   <Button 
                     type="button"
                     variant="outline"
-                    onClick={() => handleQuickLogin("organiser")}
+                    onClick={() => handleQuickLogin("ORGANIZER")}
                     className="h-11 border-border/50 hover:bg-primary/10 hover:border-primary/50 transition-all rounded-lg"
                   >
                     Host

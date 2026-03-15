@@ -57,7 +57,7 @@ const Leaderboard = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-24 pb-16 max-w-5xl">
+      <main className="container mx-auto px-4 pt-20 md:pt-24 pb-16 max-w-5xl">
         {/* Page Header */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -81,7 +81,7 @@ const Leaderboard = () => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="grid grid-cols-3 gap-4 mb-10"
+            className="flex flex-col md:grid md:grid-cols-3 gap-4 mb-10"
           >
             {[filtered[1], filtered[0], filtered[2]].map((sub, idx) => {
               const rank = idx === 0 ? 2 : idx === 1 ? 1 : 3;
@@ -91,7 +91,7 @@ const Leaderboard = () => {
                   initial={{ opacity: 0, y: 30 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.15 + idx * 0.1 }}
-                  className={idx === 1 ? "-mt-2" : "mt-6"}
+                  className={idx === 1 ? "md:-mt-2 order-first md:order-none" : "mt-0 md:mt-6"}
                 >
                   <Card
                     className={`text-center border-border/50 transition-all hover:border-primary/30 ${

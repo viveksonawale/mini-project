@@ -76,7 +76,7 @@ const TeamManagement = () => {
   };
 
   return (
-    <div className="container mx-auto px-4 py-24 max-w-5xl">
+    <div className="container mx-auto px-4 pt-20 md:pt-24 pb-16 max-w-5xl">
       <div className="mb-8 border-b pb-6">
         <h1 className="text-4xl font-bold mb-2 font-heading tracking-tight">Team Management</h1>
         <p className="text-muted-foreground text-lg">Manage your team members for this hackathon.</p>
@@ -226,7 +226,7 @@ const TeamManagement = () => {
           <div className="flex justify-end pt-2">
             <AlertDialog>
               <AlertDialogTrigger asChild>
-                <Button variant="destructive" variant="outline" className="text-destructive border-destructive hover:bg-destructive hover:text-white rounded-full px-6">
+                <Button variant="outline" className="text-destructive border-destructive hover:bg-destructive hover:text-white rounded-full px-6">
                   <LogOut className="mr-2 h-4 w-4" />
                   Leave Team
                 </Button>

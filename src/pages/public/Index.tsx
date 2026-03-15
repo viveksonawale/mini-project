@@ -77,7 +77,7 @@ const Index = () => {
           />
         </div>
 
-        <div className="container relative mx-auto flex min-h-screen flex-col items-center justify-center px-4 py-20">
+        <div className="container relative mx-auto flex min-h-[90vh] md:min-h-screen flex-col items-center justify-center px-4 py-12 md:py-20">
           <motion.div
             className="mx-auto max-w-3xl text-center"
             initial="hidden"
@@ -93,7 +93,7 @@ const Index = () => {
             <motion.h1
               variants={fadeUp}
               custom={1}
-              className="font-heading text-5xl font-bold leading-[1.1] tracking-tight md:text-7xl lg:text-8xl text-foreground"
+              className="font-heading text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-bold leading-[1.2] sm:leading-[1.1] tracking-tight text-foreground"
             >
               Build the <span className="text-primary italic">Future</span>. <br /> Effortlessly.
             </motion.h1>
@@ -101,7 +101,7 @@ const Index = () => {
             <motion.p
               variants={fadeUp}
               custom={2}
-              className="mx-auto mt-8 max-w-2xl text-xl text-muted-foreground/80 leading-relaxed"
+              className="mx-auto mt-6 md:mt-8 max-w-2xl text-lg md:text-xl text-muted-foreground/80 leading-relaxed"
             >
               The unified platform where organizing and participating in hackathons becomes secondary to what matters most: <span className="text-foreground font-medium">Innovation</span>.
             </motion.p>
@@ -109,7 +109,7 @@ const Index = () => {
             <motion.div
               variants={fadeUp}
               custom={3}
-              className="mt-12 flex flex-col items-center gap-5 sm:flex-row sm:justify-center"
+              className="mt-10 md:mt-12 flex flex-col items-center gap-4 sm:flex-row sm:justify-center"
             >
               <Link to="/signup">
                 <Button
@@ -130,16 +130,15 @@ const Index = () => {
               </Link>
             </motion.div>
 
-            {/* Platform Tags */}
             <motion.div
               variants={fadeUp}
               custom={4}
-              className="mt-16 flex flex-wrap justify-center gap-3"
+              className="mt-12 md:mt-16 flex flex-wrap justify-center gap-2 md:gap-3"
             >
               <HeroTag text="100% Free" />
               <HeroTag text="One Platform" />
               <HeroTag text="Easy to Use" />
-              <HeroTag text="Automated Management" />
+              <HeroTag text="Automated" />
             </motion.div>
           </motion.div>
         </div>

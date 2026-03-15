@@ -1,6 +1,8 @@
-import React, { createContext, useContext, useState, useCallback } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import { authApi, LoginResponse } from "@/api/authApi";
+import { AxiosError } from "axios";
 
-export type UserRole = "organiser" | "participant" | null;
+export type UserRole = "ORGANIZER" | "PARTICIPANT" | null;
 
 export interface User {
   id: string;
@@ -13,8 +15,9 @@ export interface User {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
-  login: (email: string, password: string) => { success: boolean; error?: string };
-  signup: (name: string, email: string, password: string) => { success: boolean; error?: string };
+  isLoading: boolean;
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  signup: (name: string, email: string, password: string, role: UserRole) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
   selectRole: (role: UserRole) => void;
   quickLogin: (role: UserRole) => void;
@@ -27,56 +30,78 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     const saved = localStorage.getItem("evnova-user");
     return saved ? JSON.parse(saved) : null;
   });
+  const [isLoading, setIsLoading] = useState(true);
 
-  const persist = (u: User | null) => {
-    setUser(u);
-    if (u) {
-      localStorage.setItem("evnova-user", JSON.stringify(u));
+  const persist = useCallback((data: LoginResponse | null) => {
+    if (data) {
+      setUser(data.user);
+      localStorage.setItem("evnova-user", JSON.stringify(data.user));
+      localStorage.setItem("evnova-token", data.accessToken);
     } else {
+      setUser(null);
       localStorage.removeItem("evnova-user");
+      localStorage.removeItem("evnova-token");
     }
-  };
-
-  const login = useCallback((email: string, _password: string) => {
-    // Basic validation
-    if (!email) return { success: false, error: "Email is required" };
-    
-    // Dummy login: accept anything
-    const name = email.split('@')[0];
-    const dummyUser: User = { 
-      id: Math.random().toString(36).substr(2, 9), 
-      name: name.charAt(0).toUpperCase() + name.slice(1), 
-      email: email, 
-      role: email.includes('host') ? 'organiser' : 'participant' 
-    };
-    persist(dummyUser);
-    return { success: true };
   }, []);
 
-  const signup = useCallback((name: string, email: string, _password: string) => {
-    if (!email || !name) return { success: false, error: "Name and email are required" };
-    
-    const dummyUser: User = { 
-      id: Math.random().toString(36).substr(2, 9), 
-      name, 
-      email, 
-      role: null 
+  const logout = useCallback(() => persist(null), [persist]);
+
+  useEffect(() => {
+    const initAuth = async () => {
+      const token = localStorage.getItem("evnova-token");
+      if (token) {
+        try {
+          const userData = await authApi.getMe();
+          setUser(userData);
+          localStorage.setItem("evnova-user", JSON.stringify(userData));
+        } catch (error) {
+          logout();
+        }
+      }
+      setIsLoading(false);
     };
-    persist(dummyUser);
-    return { success: true };
-  }, []);
+
+    initAuth();
+  }, [logout]);
+
+  const login = useCallback(async (email: string, password: string) => {
+    try {
+      const data = await authApi.login({ email, password });
+      persist(data);
+      return { success: true };
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string; error?: string }>;
+      return { 
+        success: false, 
+        error: axiosError.response?.data?.message || axiosError.response?.data?.error || "Login failed. Please check your credentials." 
+      };
+    }
+  }, [persist]);
+
+  const signup = useCallback(async (name: string, email: string, password: string, role: UserRole) => {
+    try {
+      if (!role) throw new Error("Role is required");
+      const data = await authApi.signup({ name, email, password, role });
+      persist(data);
+      return { success: true };
+    } catch (error) {
+      const axiosError = error as AxiosError<{ message?: string; error?: string }>;
+      return { 
+        success: false, 
+        error: axiosError.response?.data?.message || axiosError.response?.data?.error || "Signup failed. Please try again." 
+      };
+    }
+  }, [persist]);
 
   const quickLogin = useCallback((role: UserRole) => {
     const dummyUser: User = {
-      id: role === "organiser" ? "org-1" : "part-1",
-      name: role === "organiser" ? "Host User" : "Participant User",
-      email: role === "organiser" ? "host@evnova.com" : "user@evnova.com",
+      id: role === "ORGANIZER" ? "org-1" : "part-1",
+      name: role === "ORGANIZER" ? "Host User" : "Participant User",
+      email: role === "ORGANIZER" ? "host@evnova.com" : "user@evnova.com",
       role: role
     };
-    persist(dummyUser);
-  }, []);
-
-  const logout = useCallback(() => persist(null), []);
+    persist({ accessToken: "dummy-token", user: dummyUser });
+  }, [persist]);
 
   const selectRole = useCallback((role: UserRole) => {
     setUser((prev) => {
@@ -88,7 +113,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isAuthenticated: !!user, login, signup, logout, selectRole, quickLogin }}>
+    <AuthContext.Provider value={{ user, isAuthenticated: !!user, isLoading, login, signup, logout, selectRole, quickLogin }}>
       {children}
     </AuthContext.Provider>
   );

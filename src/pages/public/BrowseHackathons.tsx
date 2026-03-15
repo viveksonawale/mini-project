@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Filter, MapPin, Globe, Calendar, Trophy, Users, ChevronRight } from "lucide-react";
+import { Search, Filter, MapPin, Globe, Calendar, Trophy, Users, ChevronRight, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -8,7 +8,10 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { mockHackathons, type Hackathon } from "@/data/mockData";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { hackathonApi, Hackathon } from "@/api/hackathonApi";
+import { useAuth } from "@/contexts/AuthContext";
+import { AxiosError } from "axios";
 
 const typeFilters = ["All", "Online", "Offline"] as const;
 const statusFilters = ["All", "Open", "Upcoming", "Ongoing", "Completed"] as const;
@@ -28,18 +31,23 @@ const BrowseHackathons = () => {
   const [domainFilter, setDomainFilter] = useState<string>("All");
   const [showFilters, setShowFilters] = useState(false);
 
-  const filtered = mockHackathons.filter((h) => {
-    if (search && !h.title.toLowerCase().includes(search.toLowerCase()) && !h.description.toLowerCase().includes(search.toLowerCase())) return false;
+  const { data: hackathons = [], isLoading, isError, error } = useQuery({
+    queryKey: ['hackathons'],
+    queryFn: hackathonApi.getHackathons
+  });
+
+  const filtered = hackathons.filter((h) => {
+    if (search && !h.title?.toLowerCase().includes(search.toLowerCase()) && !h.description?.toLowerCase().includes(search.toLowerCase())) return false;
     if (typeFilter !== "All" && h.type !== typeFilter.toLowerCase()) return false;
     if (statusFilter !== "All" && h.status !== statusFilter.toLowerCase()) return false;
-    if (domainFilter !== "All" && !h.themes.includes(domainFilter)) return false;
+    if (domainFilter !== "All" && !h.themes?.includes(domainFilter)) return false;
     return true;
   });
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <main className="container mx-auto px-4 pt-24 pb-16">
+      <main className="container mx-auto px-4 pt-20 md:pt-24 pb-16">
         {/* Header */}
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
           <h1 className="font-heading text-4xl font-bold mb-2">Browse Hackathons</h1>
@@ -89,21 +97,40 @@ const BrowseHackathons = () => {
           )}
         </AnimatePresence>
 
-        {/* Results count */}
-        <p className="text-sm text-muted-foreground mb-4">{filtered.length} hackathon{filtered.length !== 1 ? "s" : ""} found</p>
-
-        {/* Hackathon Grid */}
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((h, i) => (
-            <HackathonCard key={h.id} hackathon={h} index={i} />
-          ))}
-        </div>
-
-        {filtered.length === 0 && (
-          <div className="text-center py-16 text-muted-foreground">
-            <p className="text-lg">No hackathons match your filters.</p>
-            <Button variant="link" onClick={() => { setSearch(""); setTypeFilter("All"); setStatusFilter("All"); setDomainFilter("All"); }}>Clear filters</Button>
+        {isLoading ? (
+          <div className="flex flex-col items-center justify-center py-20">
+            <Loader2 className="h-10 w-10 animate-spin text-primary mb-4" />
+            <p className="text-muted-foreground">Loading hackathons...</p>
           </div>
+        ) : isError ? (
+          <div className="text-center py-16 text-destructive">
+            <p className="text-lg mb-2">Failed to load hackathons.</p>
+            <p className="text-sm">{(error as Error)?.message || "Please check if the backend is running."}</p>
+          </div>
+        ) : (
+          <>
+            {/* Results count */}
+            <p className="text-sm text-muted-foreground mb-4">{filtered.length} hackathon{filtered.length !== 1 ? "s" : ""} found</p>
+
+            {/* Hackathon Grid */}
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((h, i) => (
+                <HackathonCard key={h.id} hackathon={h} index={i} />
+              ))}
+            </div>
+
+            {filtered.length === 0 && (
+              <div className="text-center py-16 text-muted-foreground">
+                <p className="text-lg">No hackathons match your filters.</p>
+                <button 
+                  className="text-primary hover:underline mt-2" 
+                  onClick={() => { setSearch(""); setTypeFilter("All"); setStatusFilter("All"); setDomainFilter("All"); }}
+                >
+                  Clear filters
+                </button>
+              </div>
+            )}
+          </>
         )}
       </main>
       <Footer />
@@ -124,19 +151,19 @@ const HackathonCard = ({ hackathon: h, index }: { hackathon: Hackathon; index: n
           <h3 className="text-lg font-bold text-primary-foreground font-heading">{h.title}</h3>
         </div>
         <CardContent className="p-4 space-y-3">
-          <p className="text-sm text-muted-foreground line-clamp-2">{h.description}</p>
+          <p className="text-sm text-muted-foreground line-clamp-2">{h.description || "No description available."}</p>
           <div className="flex flex-wrap gap-1">
-            {h.themes.slice(0, 3).map((t) => (
+            {h.themes?.slice(0, 3).map((t) => (
               <Badge key={t} variant="outline" className="text-xs">{t}</Badge>
             ))}
           </div>
           <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-            <div className="flex items-center gap-1"><Calendar className="h-3 w-3" />{h.startDate.slice(5)}</div>
-            <div className="flex items-center gap-1"><Trophy className="h-3 w-3" />{h.prizePool}</div>
-            <div className="flex items-center gap-1"><Users className="h-3 w-3" />{h.participants}</div>
+            <div className="flex items-center gap-1"><Calendar className="h-3 w-3" />{h.startDate ? h.startDate.slice(5) : "TBD"}</div>
+            <div className="flex items-center gap-1"><Trophy className="h-3 w-3" />{h.prizePool || "0"}</div>
+            <div className="flex items-center gap-1"><Users className="h-3 w-3" />{h.participants || 0}</div>
           </div>
           <div className="flex items-center justify-between pt-2 border-t border-border/50">
-            <span className="text-xs text-muted-foreground">by {h.organiser}</span>
+            <span className="text-xs text-muted-foreground">by {h.organiser || h.organizer?.name || "Unknown"}</span>
             <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
           </div>
         </CardContent>

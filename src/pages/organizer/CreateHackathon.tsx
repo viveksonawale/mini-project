@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowLeft, ArrowRight, Check, Zap } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Zap, Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +11,10 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { hackathonApi, Hackathon } from "@/api/hackathonApi";
+import { useAuth } from "@/contexts/AuthContext";
+import { AxiosError } from "axios";
 
 const STEPS = ["Basic Info", "Details", "Themes & Rules", "Review"];
 
@@ -49,6 +53,24 @@ const CreateHackathon = () => {
   const [form, setForm] = useState<FormData>(initial);
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
+
+  const createMutation = useMutation({
+    mutationFn: (data: Partial<Hackathon>) => hackathonApi.createHackathon(data),
+    onSuccess: () => {
+      toast({ title: "Hackathon Created! 🎉", description: `"${form.title}" has been published successfully.` });
+      queryClient.invalidateQueries({ queryKey: ['hackathons'] });
+      navigate("/organizer/dashboard");
+    },
+    onError: (error: AxiosError<{ message: string }>) => {
+      toast({ 
+        title: "Error", 
+        description: error.response?.data?.message || "Failed to create hackathon.", 
+        variant: "destructive" 
+      });
+    }
+  });
 
   const set = <K extends keyof FormData>(key: K, value: FormData[K]) =>
     setForm((p) => ({ ...p, [key]: value }));
@@ -68,8 +90,25 @@ const CreateHackathon = () => {
   };
 
   const handlePublish = () => {
-    toast({ title: "Hackathon Created! 🎉", description: `"${form.title}" has been published successfully.` });
-    navigate("/organiser/dashboard");
+    const payload: Partial<Hackathon> = {
+      ...form,
+      status: "upcoming",
+      organiser: user?.name || "Unknown",
+      participants: 0,
+      teams: 0,
+      bannerGradient: "from-primary to-hackmate-blue-glow", // Default
+      timeline: {
+        registrationStart: new Date().toISOString().split('T')[0],
+        registrationEnd: form.registrationDeadline,
+        hackathonStart: form.startDate,
+        submissionDeadline: form.endDate,
+      },
+      prizes: [
+        { position: "1st Place", amount: form.prizePool, description: "Grand Prize" }
+      ],
+      rules: form.rules ? form.rules.split('\n').filter(r => r.trim() !== "") : []
+    };
+    createMutation.mutate(payload);
   };
 
   return (
@@ -222,7 +261,7 @@ const CreateHackathon = () => {
 
         {/* Navigation */}
         <div className="mt-6 flex justify-between">
-          <Button variant="outline" disabled={step === 0} onClick={() => setStep((s) => s - 1)}>
+          <Button variant="outline" disabled={step === 0 || createMutation.isPending} onClick={() => setStep((s) => s - 1)}>
             <ArrowLeft className="mr-1 h-4 w-4" /> Previous
           </Button>
           {step < STEPS.length - 1 ? (
@@ -230,8 +269,9 @@ const CreateHackathon = () => {
               Next <ArrowRight className="h-4 w-4" />
             </Button>
           ) : (
-            <Button onClick={handlePublish} className="bg-primary text-primary-foreground gap-1">
-              <Zap className="h-4 w-4" /> Publish Hackathon
+            <Button disabled={createMutation.isPending} onClick={handlePublish} className="bg-primary text-primary-foreground gap-1">
+              {createMutation.isPending ? <Loader2 className="h-4 w-4 animate-spin" /> : <Zap className="h-4 w-4" />}
+              Publish Hackathon
             </Button>
           )}
         </div>

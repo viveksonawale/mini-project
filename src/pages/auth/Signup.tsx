@@ -16,27 +16,31 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
-  const [role, setRole] = useState<"organiser" | "participant">("participant");
+  const [role, setRole] = useState<"ORGANIZER" | "PARTICIPANT">("PARTICIPANT");
+  const [isLoading, setIsLoading] = useState(false);
   
   const { signup, selectRole } = useAuth();
   const navigate = useNavigate();
   const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (password !== confirmPassword) {
       toast({ title: "Passwords don't match", variant: "destructive" });
       return;
     }
     
-    // Dummy signup logic
-    const result = signup(name, email, password);
-    if (result.success) {
-      selectRole(role);
-      toast({ title: "Account created!", description: "Welcome to EVNOVA." });
-      navigate("/");
-    } else {
-      toast({ title: "Signup failed", description: result.error, variant: "destructive" });
+    setIsLoading(true);
+    try {
+      const result = await signup(name, email, password, role);
+      if (result.success) {
+        toast({ title: "Account created!", description: "Welcome to EVNOVA." });
+        navigate("/");
+      } else {
+        toast({ title: "Signup failed", description: result.error, variant: "destructive" });
+      }
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -194,11 +198,11 @@ const Signup = () => {
                   <Label className="text-sm font-medium text-foreground/90">I want to:</Label>
                   <RadioGroup 
                     value={role} 
-                    onValueChange={(val) => setRole(val as "participant" | "organiser")}
+                    onValueChange={(val) => setRole(val as "PARTICIPANT" | "ORGANIZER")}
                     className="grid grid-cols-2 gap-4"
                   >
                     <div>
-                      <RadioGroupItem value="participant" id="participant" className="peer sr-only" />
+                      <RadioGroupItem value="PARTICIPANT" id="participant" className="peer sr-only" />
                       <Label
                         htmlFor="participant"
                         className="flex flex-col items-center justify-between rounded-xl border-2 border-border/50 bg-background/50 p-4 hover:bg-muted/30 hover:text-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"
@@ -207,7 +211,7 @@ const Signup = () => {
                       </Label>
                     </div>
                     <div>
-                      <RadioGroupItem value="organiser" id="organiser" className="peer sr-only" />
+                      <RadioGroupItem value="ORGANIZER" id="organiser" className="peer sr-only" />
                       <Label
                         htmlFor="organiser"
                         className="flex flex-col items-center justify-between rounded-xl border-2 border-border/50 bg-background/50 p-4 hover:bg-muted/30 hover:text-foreground peer-data-[state=checked]:border-primary peer-data-[state=checked]:bg-primary/5 cursor-pointer transition-all"

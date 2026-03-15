@@ -17,14 +17,14 @@ const Navbar = () => {
     navigate("/");
   };
 
-  const handleQuickLogin = (role: "organiser" | "participant") => {
+  const handleQuickLogin = (role: "ORGANIZER" | "PARTICIPANT") => {
     quickLogin(role);
     toast({ 
-      title: `Demo Mode: ${role === 'organiser' ? 'Host' : 'Participant'}`, 
+      title: `Demo Mode: ${role === 'ORGANIZER' ? 'Host' : 'Participant'}`, 
       description: "Logged in automatically for demo purpose." 
     });
     setMobileOpen(false);
-    navigate(role === 'organiser' ? '/organizer/dashboard' : '/participant/dashboard');
+    navigate(role === 'ORGANIZER' ? '/organizer/dashboard' : '/participant/dashboard');
   };
 
   const openLogin = () => {
@@ -41,8 +41,8 @@ const Navbar = () => {
     { label: "Hackathons", to: "/hackathons" },
     { label: "Leaderboard", to: "/leaderboard" },
     { label: "About", to: "/about" },
-    ...(isAuthenticated && user?.role === "organiser" ? [{ label: "Dashboard", to: "/organizer/dashboard" }] : []),
-    ...(isAuthenticated && user?.role === "participant" ? [{ label: "Dashboard", to: "/participant/dashboard" }] : []),
+    ...(isAuthenticated && user?.role === "ORGANIZER" ? [{ label: "Dashboard", to: "/organizer/dashboard" }] : []),
+    ...(isAuthenticated && user?.role === "PARTICIPANT" ? [{ label: "Dashboard", to: "/participant/dashboard" }] : []),
   ];
 
   return (
@@ -80,7 +80,7 @@ const Navbar = () => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onClick={() => handleQuickLogin("participant")}
+                  onClick={() => handleQuickLogin("PARTICIPANT")}
                   className="h-8 text-[11px] uppercase tracking-wider font-bold hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20"
                 >
                   User Demo
@@ -88,7 +88,7 @@ const Navbar = () => {
                 <Button 
                   variant="ghost" 
                   size="sm" 
-                  onClick={() => handleQuickLogin("organiser")}
+                  onClick={() => handleQuickLogin("ORGANIZER")}
                   className="h-8 text-[11px] uppercase tracking-wider font-bold hover:bg-primary/10 hover:text-primary border border-transparent hover:border-primary/20"
                 >
                   Host Demo
@@ -154,12 +154,12 @@ const Navbar = () => {
         {mobileOpen && (
           <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl md:hidden overflow-hidden transition-all duration-300">
             <div className="container mx-auto flex flex-col gap-4 px-4 py-6">
-              <div className="grid grid-cols-1 gap-2">
+              <div className="grid grid-cols-1 gap-1">
                 {navLinks.map((l) => (
                   <Link
                     key={l.to}
                     to={l.to}
-                    className="flex items-center h-12 px-4 rounded-xl text-base font-semibold text-muted-foreground hover:bg-muted/50 hover:text-foreground transition-all"
+                    className="flex items-center h-12 px-4 rounded-xl text-base font-semibold text-muted-foreground hover:bg-primary/10 hover:text-primary transition-all active:scale-95"
                     onClick={() => setMobileOpen(false)}
                   >
                     {l.label}
@@ -174,7 +174,7 @@ const Navbar = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => handleQuickLogin("participant")}
+                        onClick={() => handleQuickLogin("PARTICIPANT")}
                         className="h-11 rounded-xl font-bold border-border/50"
                       >
                         <UserIcon className="mr-2 h-4 w-4" /> User Demo
@@ -182,7 +182,7 @@ const Navbar = () => {
                       <Button 
                         variant="outline" 
                         size="sm" 
-                        onClick={() => handleQuickLogin("organiser")}
+                        onClick={() => handleQuickLogin("ORGANIZER")}
                         className="h-11 rounded-xl font-bold border-border/50"
                       >
                         <Shield className="mr-2 h-4 w-4" /> Host Demo
