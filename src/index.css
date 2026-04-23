@@ -1,0 +1,108 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 240 20% 98%;
+    --foreground: 250 25% 10%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 250 25% 10%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 250 25% 10%;
+
+    --primary: 262 83% 58%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 70% 55%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 240 10% 93%;
+    --muted-foreground: 240 5% 46%;
+
+    --accent: 142 76% 46%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 240 12% 90%;
+    --input: 240 12% 90%;
+    --ring: 262 83% 58%;
+
+    --radius: 0.75rem;
+
+    --evnova-orange: 25 95% 53%;
+    --evnova-purple-glow: 270 90% 65%;
+    --evnova-blue-glow: 210 100% 60%;
+
+    --sidebar-background: 250 25% 8%;
+    --sidebar-foreground: 240 10% 90%;
+    --sidebar-primary: 262 83% 58%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 250 20% 15%;
+    --sidebar-accent-foreground: 240 10% 90%;
+    --sidebar-border: 250 15% 18%;
+    --sidebar-ring: 262 83% 58%;
+  }
+
+  .dark {
+    --background: 250 25% 6%;
+    --foreground: 240 10% 95%;
+
+    --card: 250 20% 10%;
+    --card-foreground: 240 10% 95%;
+
+    --popover: 250 20% 10%;
+    --popover-foreground: 240 10% 95%;
+
+    --primary: 262 83% 62%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 70% 60%;
+    --secondary-foreground: 0 0% 100%;
+
+    --muted: 250 15% 16%;
+    --muted-foreground: 240 8% 60%;
+
+    --accent: 142 76% 50%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 62% 30%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 250 15% 18%;
+    --input: 250 15% 18%;
+    --ring: 262 83% 62%;
+
+    --evnova-orange: 25 95% 58%;
+    --evnova-purple-glow: 270 90% 70%;
+    --evnova-blue-glow: 210 100% 65%;
+
+    --sidebar-background: 250 25% 5%;
+    --sidebar-foreground: 240 10% 90%;
+    --sidebar-primary: 262 83% 62%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 250 20% 12%;
+    --sidebar-accent-foreground: 240 10% 90%;
+    --sidebar-border: 250 15% 15%;
+    --sidebar-ring: 262 83% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Space Grotesk', sans-serif;
+  }
+}
